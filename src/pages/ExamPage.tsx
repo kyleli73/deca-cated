@@ -65,6 +65,7 @@ function ExamRunner({ session, questions }: { session: Session; questions: Quest
   const [answers, setAnswers] = useState<(Letter | null)[]>(session.answers);
   const [index, setIndex] = useState(Math.min(session.currentIndex, n));
   const [, setTick] = useState(0);
+  const [saveError, setSaveError] = useState('');
   const answersRef = useRef(answers);
   const indexRef = useRef(index);
   const lockRef = useRef(false);
@@ -89,10 +90,18 @@ function ExamRunner({ session, questions }: { session: Session; questions: Quest
       if (finishingRef.current) return;
       finishingRef.current = true;
       const elapsed = Math.round(limit === null ? elapsedNow() : Math.min(limit, elapsedNow()));
-      await finishSession(session.id, endedBy, { answers: answersRef.current, elapsedSec: elapsed });
-      navigate(`/results/${session.id}`, { replace: true });
+      try {
+        await finishSession(session.id, endedBy, { answers: answersRef.current, elapsedSec: elapsed });
+        navigate(`/results/${session.id}`, { replace: true });
+      } catch (e) {
+        // Stay on the exam with autosave back on; Submit retries.
+        finishingRef.current = false;
+        setSaveError(`Couldn't save your results${e instanceof Error ? `: ${e.message}` : ''}. Your answers are still here. Try submitting again.`);
+        indexRef.current = n;
+        setIndex(n);
+      }
     },
-    [session.id, limit, elapsedNow, navigate],
+    [session.id, limit, n, elapsedNow, navigate],
   );
 
   const go = useCallback(
@@ -128,10 +137,11 @@ function ExamRunner({ session, questions }: { session: Session; questions: Quest
   useEffect(() => {
     const t = setInterval(() => {
       setTick((x) => x + 1);
-      if (limit !== null && elapsedNow() >= limit) void finish('time');
+      // After a failed save, wait for the user to retry instead of hammering it.
+      if (limit !== null && elapsedNow() >= limit && !saveError) void finish('time');
     }, 250);
     return () => clearInterval(t);
-  }, [limit, elapsedNow, finish]);
+  }, [limit, elapsedNow, finish, saveError]);
 
   // Save progress regularly and whenever the page is hidden or left.
   useEffect(() => {
@@ -208,6 +218,11 @@ function ExamRunner({ session, questions }: { session: Session; questions: Quest
       </header>
 
       <main className="exam-main">
+        {saveError && (
+          <div className="notice bad" role="alert" style={{ marginBottom: 24 }}>
+            {saveError}
+          </div>
+        )}
         {onSummary ? (
           <Summary answers={answers} n={n} onGo={go} onSubmit={() => void finish('submit')} index={index} />
         ) : (

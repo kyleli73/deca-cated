@@ -93,6 +93,20 @@ function toQuestionFields(q: EditableQuestion) {
 }
 
 /**
+ * Past attempts and mistake cards store answers as letters, so a replacement
+ * keeps the stored option order (a repeated question may list its options in
+ * a different order) and re-letters the answer to match.
+ */
+function inStoredOrder<T extends { options: string[]; answer: Letter }>(fields: T, stored: Question): T {
+  const incoming = fields.options.map(normalizeForMatch);
+  const options = stored.options.map((o) => fields.options[incoming.indexOf(normalizeForMatch(o))]);
+  if (options.some((o) => o === undefined)) return fields;
+  const answerText = incoming[LETTERS.indexOf(fields.answer)];
+  const answer = LETTERS[stored.options.map(normalizeForMatch).indexOf(answerText)];
+  return answer ? { ...fields, options, answer } : fields;
+}
+
+/**
  * Save an exam. Questions already in the bank (same stem and options) are
  * linked to the new exam instead of copied; `replace[i]` overwrites the
  * stored copy with the imported text instead.
@@ -108,7 +122,7 @@ export async function saveImportedExam(meta: ExamMeta, questions: EditableQuesti
       if (existing) {
         saved = {
           ...existing,
-          ...(replace[i] ? fields : {}),
+          ...(replace[i] ? inStoredOrder(fields, existing) : {}),
           examIds: [...new Set([...existing.examIds, exam.id])],
           clusters: [...new Set([...existing.clusters, meta.cluster])],
           years: [...new Set([...existing.years, meta.year])],

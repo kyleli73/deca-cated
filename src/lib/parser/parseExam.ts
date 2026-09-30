@@ -27,6 +27,16 @@ const SOURCE_LINE = /^SOURCE\s*:\s*(.*)$/i;
 const CODE_AT_START = /^\(?([A-Z]{2,3})\s?:\s?(\d{3})\b\)?/;
 const CODE_ANYWHERE = /\b([A-Z]{2,3}):(\d{3})\b/;
 
+/**
+ * "12. C", "12. C Explanation…", "12. Answer: C". Not "12. A company…": a
+ * question whose stem starts with the article "A".
+ */
+function keyEntry(text: string): { n: number; letter: Letter; rest: string } | null {
+  const k = KEY_ENTRY.exec(text);
+  if (!k || !/^[A-D]$/.test(k[2]) || /^[a-z]/.test(k[3])) return null;
+  return { n: Number(k[1]), letter: k[2] as Letter, rest: k[3] };
+}
+
 export function isKeyHeading(text: string): boolean {
   const s = text.trim();
   if (s.length > 80) return false;
@@ -98,7 +108,7 @@ function questionNumber(text: string): number | null {
  */
 function isRealJump(lines: string[], i: number, expected: number): boolean {
   for (let j = i + 1; j < Math.min(lines.length, i + 60); j++) {
-    if (questionNumber(lines[j]) === expected && !KEY_ENTRY.test(lines[j])) return false;
+    if (questionNumber(lines[j]) === expected && !keyEntry(lines[j])) return false;
   }
   return hasOptionsAhead(lines, i);
 }
@@ -123,7 +133,7 @@ function parseQuestions(lines: string[], findKey: boolean): { drafts: Draft[]; k
     if (q && !/^\d/.test(q[2])) {
       const n = Number(q[1]);
       // No key heading: the key starts where numbering restarts.
-      if (findKey && drafts.length >= 5 && n === drafts[0].number && KEY_ENTRY.test(text)) return { drafts, keyFrom: i };
+      if (findKey && drafts.length >= 5 && n === drafts[0].number && keyEntry(text)) return { drafts, keyFrom: i };
       const accept =
         n === expected ||
         (n > expected && n <= expected + 5 && isRealJump(lines, i, expected)) ||
@@ -151,13 +161,20 @@ function parseQuestions(lines: string[], findKey: boolean): { drafts: Draft[]; k
   return { drafts, keyFrom: null };
 }
 
-/** Stem text; also catches options run into the stem ("…is: A. x B. y C. z D. w"). */
+/**
+ * Stem text; also catches all four options run into the stem ("…is? A. x B. y
+ * C. z D. w"). All four are required so initials like "Mr. A. Smith and Ms.
+ * B. Jones" stay in the stem.
+ */
+const INLINE_OPTIONS = /(?:^|\s)\(?A[.)]\s+\S.*?\s\(?B[.)]\s+\S.*?\s\(?C[.)]\s+\S.*?\s\(?D[.)]\s+\S/;
 function appendStem(d: Draft, text: string) {
-  const a = /(?:^|\s)\(?A[.)]\s+/.exec(text);
-  if (a && new RegExp(`\\sB[.)]\\s+`).test(text.slice(a.index + a[0].length - 1))) {
-    const before = text.slice(0, a.index).trim();
+  const m = INLINE_OPTIONS.exec(text);
+  if (m) {
+    const a = /(?:^|\s)\(?A[.)]\s+/.exec(text.slice(m.index))!;
+    const at = m.index + a.index;
+    const before = text.slice(0, at).trim();
     if (before) d.stem.push(before);
-    addOptions(d, 0, text.slice(a.index + a[0].length).trim());
+    addOptions(d, 0, text.slice(at + a[0].length).trim());
     return;
   }
   d.stem.push(text);
@@ -201,15 +218,11 @@ function parseKey(lines: string[]): { entries: Map<number, KeyDraft>; duplicates
       continue;
     }
 
-    const k = KEY_ENTRY.exec(text);
-    if (k && /^[A-D]$/.test(k[2])) {
-      const n = Number(k[1]);
-      const rest = k[3];
-      if (n > last && (last === 0 || n <= last + 5) && !/^[a-z]/.test(rest)) {
-        cur = start(n, k[2], rest);
-        last = n;
-        continue;
-      }
+    const k = keyEntry(text);
+    if (k && k.n > last && (last === 0 || k.n <= last + 5)) {
+      cur = start(k.n, k.letter, k.rest);
+      last = k.n;
+      continue;
     }
     if (!cur) continue;
 
@@ -278,9 +291,9 @@ export function parseExam(input: string | string[][]): ParseResult {
   }
 
   const numbers = drafts.map((d) => d.number);
-  const max = Math.max(0, ...numbers);
   const missing: number[] = [];
-  for (let n = 1; n <= max; n++) if (!numbers.includes(n)) missing.push(n);
+  // Count from the first question found: a partial exam may start at 26.
+  for (let n = Math.min(...numbers); n <= Math.max(0, ...numbers); n++) if (!numbers.includes(n)) missing.push(n);
   if (missing.length) warnings.push(`Question numbers not found: ${listNumbers(missing)}.`);
 
   const orphans = [...entries.keys()].filter((n) => !numbers.includes(n)).sort((a, b) => a - b);

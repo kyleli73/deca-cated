@@ -207,7 +207,46 @@ describe('parseExam on hand-written messy text', () => {
     const r = parseExam(text);
     expect(r.questions.map((q) => q.number)).toEqual(SAMPLE_QUESTIONS.slice(25, 50).map((q) => q.number));
     r.questions.forEach((q, i) => expect(q).toEqual(SAMPLE_QUESTIONS[25 + i]));
-    expect(r.warnings).toContain('Question numbers not found: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 and 13 more.');
+    expect(r.warnings).toEqual(['Found 25 questions. DECA exams usually have 100.']);
+  });
+
+  it('keeps bare code lines in a pasted key (they repeat like headers but are not)', () => {
+    const qs = [1, 2, 3, 4].flatMap((n) => [`${n}. Question ${n}?`, 'A. a', 'B. b', 'C. c', 'D. d']);
+    const key = [1, 2, 3, 4].flatMap((n) => [`${n}. B`, `Because ${n}.`, `FI:01${n}`, `SOURCE: Book ${n}.`]);
+    const r = parseExam([...qs, 'ANSWER KEY', ...key].join('\n'));
+    expect(r.questions.map((q) => q.piCode)).toEqual(['FI:011', 'FI:012', 'FI:013', 'FI:014']);
+    expect(r.questions.map((q) => q.source)).toEqual(['Book 1.', 'Book 2.', 'Book 3.', 'Book 4.']);
+  });
+
+  it('does not skip a question whose stem starts with "A " after a stray number line', () => {
+    const text = [
+      '1. First?', 'A. a', 'B. b', 'C. c', 'D. d',
+      '2. Second covers', '4. things', 'A. a', 'B. b', 'C. c', 'D. d',
+      '3. A company wants to know what?', 'A. a', 'B. b', 'C. c', 'D. d',
+      '4. Fourth?', 'A. a', 'B. b', 'C. c', 'D. d',
+    ].join('\n');
+    const r = parseExam(text);
+    expect(r.questions.map((q) => q.number)).toEqual([1, 2, 3, 4]);
+    expect(r.questions[1].stem).toBe('Second covers 4. things');
+    expect(r.questions[2].stem).toBe('A company wants to know what?');
+  });
+
+  it('keeps a number that wrapped onto its own line in pasted text', () => {
+    const q = parseExam(['1. How much?', 'A. 100', 'B.', '250', 'C. 300', 'D. 400'].join('\n')).questions[0];
+    expect(q.options).toEqual(['100', '250', '300', '400']);
+  });
+
+  it('still drops page numbers next to running headers in pasted text', () => {
+    const page = (n: number) => [`${n}`, 'Copyright © 2023 Sample', 'FINANCE CLUSTER EXAM', 'Test 1255'];
+    const text = ['1. How much?', 'A. 100', ...page(1), 'B. 200', 'C. 300', ...page(2), 'D. 400', ...page(3)].join('\n');
+    expect(parseExam(text).questions[0].options).toEqual(['100', '200', '300', '400']);
+  });
+
+  it('keeps initials in a stem instead of splitting them into options', () => {
+    const text = ['2. Mr. A. Smith and Ms. B. Jones own a firm. What is it?', 'A. a', 'B. b', 'C. c', 'D. d'].join('\n');
+    const q = parseExam(text).questions[0];
+    expect(q.stem).toBe('Mr. A. Smith and Ms. B. Jones own a firm. What is it?');
+    expect(q.options).toEqual(['a', 'b', 'c', 'd']);
   });
 
   it('flags a missing key', () => {

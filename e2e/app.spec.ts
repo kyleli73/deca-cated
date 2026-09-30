@@ -184,8 +184,14 @@ test('import review flags problems, and repeated questions are linked instead of
   await expect(q2).toContainText('No correct answer. Pick one.');
   await page.getByLabel('Year').fill('2024');
   await expect(page.getByRole('button', { name: 'Save exam' })).toBeDisabled();
+  // "Only flagged" keeps a question on screen while it's being fixed.
+  await page.getByRole('button', { name: 'Only flagged (1)' }).click();
+  await expect(page.locator('.qedit')).toHaveCount(1);
   await q2.getByLabel('Option C').fill('receipt');
   await q2.getByLabel('A is correct').check();
+  await expect(q2).toBeVisible();
+  await expect(page.locator('.tag', { hasText: 'need fixing' })).toHaveCount(0);
+  await expect(q2).toContainText('No explanation.'); // optional warnings remain
   await expect(page.getByRole('button', { name: 'Save exam' })).toBeEnabled();
   await page.getByRole('button', { name: 'Save exam' }).click();
   await expect(page.getByText('Saved “Finance 2024 District”.')).toBeVisible();

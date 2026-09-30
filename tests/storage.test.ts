@@ -62,6 +62,18 @@ describe('importing exams', () => {
     expect(dupe?.answerDiffers).toBe(true);
   });
 
+  it('replacing a stored copy keeps its option order so past answers still point at the same option', async () => {
+    const q = SAMPLE_QUESTIONS[0];
+    const [id] = (await saveImportedExam(META, [q])).questionIds;
+    const reordered = [...q.options].reverse().map((o) => o.toUpperCase());
+    const correctText = q.options['ABCD'.indexOf(q.answer)].toUpperCase();
+    const newVersion = { ...q, stem: q.stem + ' ', options: reordered, answer: 'ABCD'[reordered.indexOf(correctText)] as Letter };
+    await saveImportedExam({ ...META, title: 'Again' }, [newVersion], [true]);
+    const stored = await db.questions.get(id);
+    expect(stored?.options).toEqual(q.options.map((o) => o.toUpperCase()));
+    expect(stored?.answer).toBe(q.answer);
+  });
+
   it('deleting an exam keeps questions shared with other exams', async () => {
     const a = await saveImportedExam(META, SAMPLE_QUESTIONS);
     const b = await saveImportedExam({ ...META, title: 'Other', year: 2025 }, SAMPLE_QUESTIONS.slice(0, 10));

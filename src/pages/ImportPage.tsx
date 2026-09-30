@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useRef, useState, type DragEvent } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { QuestionEditor, withFourOptions } from '../components/QuestionEditor.tsx';
 import { Segmented } from '../components/ui.tsx';
 import { fingerprint } from '../lib/fingerprint.ts';
-import { hasErrors, questionIssues, type EditableQuestion } from '../lib/parser/issues.ts';
+import { questionIssues, type EditableQuestion, type Issue } from '../lib/parser/issues.ts';
 import { parseExam } from '../lib/parser/parseExam.ts';
 import { findDuplicates, requestPersistentStorage, saveImportedExam, type Duplicate, type ExamMeta } from '../lib/repo.ts';
 import { LETTERS, type Cluster, type Letter } from '../lib/types.ts';
@@ -51,10 +51,13 @@ export default function ImportPage() {
   const [meta, setMeta] = useState<ExamMeta>({ title: '', cluster: 'Finance', year: 0, level: 'District' });
   const [items, setItems] = useState<Item[]>([]);
   const [warnings, setWarnings] = useState<string[]>([]);
-  const [dupes, setDupes] = useState<(Duplicate | null)[]>([]);
+  const [dupes, setDupes] = useState<Map<number, Duplicate | null>>(new Map());
   const [replace, setReplace] = useState<Set<number>>(new Set());
-  const [onlyProblems, setOnlyProblems] = useState<'all' | 'problems'>('all');
+  // "Only flagged" freezes the list when chosen, so a question doesn't vanish mid-fix.
+  const [flagged, setFlagged] = useState<Set<number> | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
+  const dupeRequest = useRef(0);
+  const fpCache = useRef(new WeakMap<Item, string>());
 
   const load = (input: string | string[][], fileName?: string) => {
     const result = parseExam(input);
@@ -65,6 +68,8 @@ export default function ImportPage() {
     setItems(result.questions.map((q, i) => ({ ...withFourOptions(q), key: i, number: q.number })));
     setWarnings(result.warnings);
     setReplace(new Set());
+    setDupes(new Map());
+    setFlagged(null);
     setMeta((m) => ({ ...m, ...(fileName ? guessMeta(fileName) : {}), fileName }));
     setError('');
     setStep('review');
@@ -95,27 +100,50 @@ export default function ImportPage() {
     if (file) void readFile(file);
   };
 
-  // Which questions are already in the library (re-checked as you edit).
+  // Which questions are already in the library, keyed by item (re-checked as you edit).
   useEffect(() => {
     if (step !== 'review') return;
-    const t = setTimeout(() => void findDuplicates(items).then(setDupes), 300);
+    const request = ++dupeRequest.current;
+    const t = setTimeout(() => {
+      void findDuplicates(items).then((found) => {
+        if (request === dupeRequest.current) setDupes(new Map(items.map((q, i) => [q.key, found[i]])));
+      });
+    }, 300);
     return () => clearTimeout(t);
   }, [items, step]);
 
-  const inExamDupes = useMemo(() => {
+  const issues = useMemo(() => new Map(items.map((q) => [q.key, questionIssues(q)])), [items]);
+
+  const sameAsEarlier = useMemo(() => {
     const first = new Map<string, number>();
-    return items.map((q) => {
-      const fp = fingerprint(q.stem, q.options);
-      if (first.has(fp)) return first.get(fp)!;
-      first.set(fp, q.number);
-      return null;
-    });
+    const out = new Map<number, number>();
+    for (const q of items) {
+      let fp = fpCache.current.get(q);
+      if (!fp) fpCache.current.set(q, (fp = fingerprint(q.stem, q.options)));
+      if (first.has(fp)) out.set(q.key, first.get(fp)!);
+      else first.set(fp, q.number);
+    }
+    return out;
   }, [items]);
 
+  const update = useCallback((key: number, next: EditableQuestion) => setItems((all) => all.map((x) => (x.key === key ? { ...x, ...next } : x))), []);
+  const remove = useCallback((key: number) => setItems((all) => all.filter((x) => x.key !== key)), []);
+  const toggleReplace = useCallback(
+    (key: number, on: boolean) =>
+      setReplace((r) => {
+        const next = new Set(r);
+        if (on) next.add(key);
+        else next.delete(key);
+        return next;
+      }),
+    [],
+  );
+
   const autoTitle = `${meta.cluster} ${meta.year || ''} ${meta.level}`.replace(/\s+/g, ' ').trim();
-  const errorCount = items.filter(hasErrors).length;
-  const warnCount = items.filter((q) => !hasErrors(q) && questionIssues(q).length > 0).length;
-  const dupeCount = dupes.filter(Boolean).length;
+  const isError = (q: Item) => issues.get(q.key)!.some((i) => i.level === 'error');
+  const errorCount = items.filter(isError).length;
+  const warnCount = items.filter((q) => !isError(q) && issues.get(q.key)!.length > 0).length;
+  const dupeCount = items.filter((q) => dupes.get(q.key)).length;
   const yearOk = meta.year >= 2000 && meta.year <= 2100;
 
   const save = async () => {
@@ -194,7 +222,7 @@ export default function ImportPage() {
     );
   }
 
-  const visible = items.filter((q) => onlyProblems === 'all' || questionIssues(q).length > 0);
+  const visible = flagged ? items.filter((q) => flagged.has(q.key)) : items;
 
   return (
     <div>
@@ -243,8 +271,8 @@ export default function ImportPage() {
       <div className="row" style={{ marginBottom: 16 }}>
         <Segmented
           label="Show"
-          value={onlyProblems}
-          onChange={setOnlyProblems}
+          value={flagged ? 'problems' : 'all'}
+          onChange={(v) => setFlagged(v === 'all' ? null : new Set(items.filter((q) => issues.get(q.key)!.length > 0).map((q) => q.key)))}
           options={[
             { value: 'all', label: 'All questions' },
             { value: 'problems', label: `Only flagged (${errorCount + warnCount})` },
@@ -253,39 +281,19 @@ export default function ImportPage() {
       </div>
 
       <div className="stack" style={{ gap: 12 }}>
-        {visible.map((q) => {
-          const idx = items.indexOf(q);
-          const dupe = dupes[idx];
-          const sameAs = inExamDupes[idx];
-          return (
-            <QuestionEditor
-              key={q.key}
-              number={q.number}
-              value={q}
-              onChange={(next) => setItems((all) => all.map((x) => (x.key === q.key ? { ...x, ...next } : x)))}
-              onDelete={() => setItems((all) => all.filter((x) => x.key !== q.key))}
-              notice={
-                dupe ? (
-                  <DuplicateNotice
-                    dupe={dupe}
-                    q={q}
-                    replacing={replace.has(q.key)}
-                    onReplace={(on) =>
-                      setReplace((r) => {
-                        const next = new Set(r);
-                        if (on) next.add(q.key);
-                        else next.delete(q.key);
-                        return next;
-                      })
-                    }
-                  />
-                ) : sameAs !== null ? (
-                  `Same as question ${sameAs} in this exam. It will be stored once.`
-                ) : undefined
-              }
-            />
-          );
-        })}
+        {visible.map((q) => (
+          <ImportItem
+            key={q.key}
+            item={q}
+            issues={issues.get(q.key)!}
+            dupe={dupes.get(q.key) ?? null}
+            sameAs={sameAsEarlier.get(q.key) ?? null}
+            replacing={replace.has(q.key)}
+            onUpdate={update}
+            onRemove={remove}
+            onReplace={toggleReplace}
+          />
+        ))}
         {visible.length === 0 && <p className="muted">No flagged questions.</p>}
       </div>
 
@@ -311,6 +319,44 @@ export default function ImportPage() {
     </div>
   );
 }
+
+/** One question in the review list; memoised so typing re-renders only the question being edited. */
+const ImportItem = memo(function ImportItem({
+  item,
+  issues,
+  dupe,
+  sameAs,
+  replacing,
+  onUpdate,
+  onRemove,
+  onReplace,
+}: {
+  item: Item;
+  issues: Issue[];
+  dupe: Duplicate | null;
+  sameAs: number | null;
+  replacing: boolean;
+  onUpdate: (key: number, q: EditableQuestion) => void;
+  onRemove: (key: number) => void;
+  onReplace: (key: number, on: boolean) => void;
+}) {
+  return (
+    <QuestionEditor
+      number={item.number}
+      value={item}
+      issues={issues}
+      onChange={(next) => onUpdate(item.key, next)}
+      onDelete={() => onRemove(item.key)}
+      notice={
+        dupe ? (
+          <DuplicateNotice dupe={dupe} q={item} replacing={replacing} onReplace={(on) => onReplace(item.key, on)} />
+        ) : sameAs !== null ? (
+          `Same as question ${sameAs} in this exam. It will be stored once.`
+        ) : undefined
+      }
+    />
+  );
+});
 
 function DuplicateNotice({ dupe, q, replacing, onReplace }: { dupe: Duplicate; q: EditableQuestion; replacing: boolean; onReplace: (on: boolean) => void }) {
   const from = dupe.examTitles.length ? ` (from ${dupe.examTitles.join(', ')})` : '';

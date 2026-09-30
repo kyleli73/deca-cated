@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { questionIssues, type EditableQuestion } from '../lib/parser/issues.ts';
+import { questionIssues, type EditableQuestion, type Issue } from '../lib/parser/issues.ts';
 import { LETTERS } from '../lib/types.ts';
 
 /** Pad or trim to exactly four options so every letter has an input. */
@@ -18,15 +18,18 @@ export function QuestionEditor({
   onDelete,
   notice,
   startOpen,
+  issues: precomputed,
 }: {
   number: number;
   value: EditableQuestion;
+  /** Pass when the caller already computed them. */
+  issues?: Issue[];
   onChange: (q: EditableQuestion) => void;
   onDelete?: () => void;
   notice?: ReactNode;
   startOpen?: boolean;
 }) {
-  const issues = questionIssues(value);
+  const issues = precomputed ?? questionIssues(value);
   const hasError = issues.some((i) => i.level === 'error');
   const [open, setOpen] = useState(startOpen ?? issues.length > 0);
   const set = (patch: Partial<EditableQuestion>) => onChange({ ...value, ...patch });
