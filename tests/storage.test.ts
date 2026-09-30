@@ -12,7 +12,7 @@ import {
   type ExamMeta,
 } from '../src/lib/repo.ts';
 import { applyResult, MASTERY_DAYS } from '../src/lib/srs.ts';
-import { computeStats, streaks } from '../src/lib/stats.ts';
+import { computeStats, examRuns, streaks } from '../src/lib/stats.ts';
 import { toBlooketCsv } from '../src/lib/blooket.ts';
 import { dueQuestionIds, filterQuestions } from '../src/lib/select.ts';
 import { addDays, dayKey } from '../src/lib/time.ts';
@@ -219,6 +219,20 @@ describe('stats', () => {
       ['EC', 100],
     ]);
     expect(s.streak).toBe(2);
+  });
+
+  it('counts finished runs of each stored exam', () => {
+    const runs = examRuns([
+      session({ examId: 'a', correctCount: 60, finishedAt: 10 }),
+      session({ examId: 'a', correctCount: 85, finishedAt: 5 }),
+      session({ examId: 'a', correctCount: 40, finishedAt: 20, endedBy: 'time' }),
+      session({ examId: 'a', status: 'active' }), // saved & exited: not done yet
+      session({ examId: 'b', correctCount: 70 }),
+      session({ mode: 'random' }), // random 100 isn't a stored exam
+    ]);
+    expect(runs.get('a')).toEqual({ count: 3, best: 85, lastAt: 20 });
+    expect(runs.get('b')?.count).toBe(1);
+    expect(runs.size).toBe(2);
   });
 
   it('keeps a streak alive until the end of today', () => {

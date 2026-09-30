@@ -429,6 +429,12 @@ textarea:focus {
   color: var(--ink-2);
   white-space: nowrap;
 }
+.tag.done {
+  background: var(--good-weak);
+  border-color: color-mix(in srgb, var(--good) 30%, transparent);
+  color: var(--good);
+  font-weight: 500;
+}
 
 /* --------------------------------------------------------------- study page */
 

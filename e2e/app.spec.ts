@@ -144,6 +144,13 @@ test('full exam run-through: import a PDF, take the exam, review, stats and mist
   await page.getByRole('button', { name: 'Save' }).click();
   await expect(page.getByText('19% of your 500 goal')).toBeVisible();
 
+  // Library shows the exam as completed, with how many times and the best score.
+  await page.getByRole('link', { name: 'Library', exact: true }).click();
+  await expect(page.getByText('1 exam · 100 unique questions · 1 completed')).toBeVisible();
+  const row = page.locator('.exam-row', { hasText: 'Finance 2025 District · Test 9123' });
+  await expect(row.locator('.tag.done')).toHaveText('Completed once');
+  await expect(row).toContainText('best 80% · last taken');
+
   // Mistakes review: the 15 wrong answers are due today (blanks aren't mistakes).
   await page.getByRole('link', { name: 'Study', exact: true }).click();
   const mistakes = page.locator('section', { has: page.getByRole('heading', { name: 'Mistakes review' }) });
