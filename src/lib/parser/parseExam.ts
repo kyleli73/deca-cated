@@ -133,6 +133,25 @@ function hasOptionsAhead(lines: string[], i: number): boolean {
   return false;
 }
 
+/**
+ * Options printed in two columns read as "A. x C. y" then "B. z D. w" (pdf.js
+ * joins text on the same baseline). Put them back in A–D order, one per line.
+ */
+function unfoldColumns(lines: string[]): string[] {
+  const out: string[] = [];
+  for (let i = 0; i < lines.length; i++) {
+    const ac = /^\(?A[.)]\s+(.+?)\s+\(?C[.)]\s+(.+)$/.exec(lines[i]);
+    const bd = ac && /^\(?B[.)]\s+(.+?)\s+\(?D[.)]\s+(.+)$/.exec(lines[i + 1] ?? '');
+    if (ac && bd) {
+      out.push(`A. ${ac[1]}`, `B. ${bd[1]}`, `C. ${ac[2]}`, `D. ${bd[2]}`);
+      i++;
+    } else {
+      out.push(lines[i]);
+    }
+  }
+  return out;
+}
+
 function parseQuestions(lines: string[], findKey: boolean): { drafts: Draft[]; keyFrom: number | null } {
   const drafts: Draft[] = [];
   let cur: Draft | null = null;
@@ -292,6 +311,7 @@ export function parseExam(input: string | string[][]): ParseResult {
     examLines = lines.filter(keep).map((l) => l.text);
     keyLines = [];
   }
+  examLines = unfoldColumns(examLines);
 
   const { drafts, keyFrom } = parseQuestions(examLines, heading < 0);
   if (keyFrom !== null) keyLines = examLines.slice(keyFrom);
@@ -351,6 +371,8 @@ const CLUSTER_NAMES: [RegExp, Cluster][] = [
   [/finance/i, 'Finance'],
 ];
 
+const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+
 /** Read the cover page: "Finance Cluster Exam", "2024-2025 Competitive Events Program", "for State/Province Use", "Test Number 1312". */
 export function examInfo(cover: string[]): ExamInfo {
   const info: ExamInfo = {};
@@ -363,9 +385,14 @@ export function examInfo(cover: string[]): ExamInfo {
   }
   const text = cover.join('\n');
   const season = /(20\d\d)\s*[-\u2013\u2014/]\s*(20\d\d)\s+competitive events/i.exec(text);
+  // Sample exams only say "Posted online March 2019 by DECA Inc."; from July on it's the next season.
+  const posted = /\bposted online\s+(?:([a-z]+)\s+)?(20\d\d)\b/i.exec(text);
   if (season) info.year = Number(season[2]);
-  // "Written Exam for State/Province Use". (Every cover mentions the "chartered association advisor", so match the phrase.)
-  const use = /\bfor\s+([\w/ ]{2,30}?)\s+use\b/i.exec(text)?.[1] ?? '';
+  else if (posted) info.year = Number(posted[2]) + (MONTHS.indexOf(posted[1]?.slice(0, 3).toLowerCase() ?? '') >= 6 ? 1 : 0);
+  // "Written Exam for State/Province Use", or "written expressly for use at DECA's ICDC".
+  // (Every cover mentions the "chartered association advisor", so match the phrase.)
+  const use =
+    /\bfor\s+([\w/ ]{2,30}?)\s+use\b/i.exec(text)?.[1] ?? /\bfor use at\s+(?:DECA['\u2019]s\s+)?([\w/ ]{2,30}?)[.,\n]/i.exec(text)?.[1] ?? '';
   if (/ICDC|international/i.test(use)) info.level = 'ICDC';
   else if (/state|province|association/i.test(use)) info.level = 'Association';
   else if (/district|regional|chapter/i.test(use)) info.level = 'District';

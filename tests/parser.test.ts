@@ -245,6 +245,30 @@ describe('parseExam on hand-written messy text', () => {
     expect(parseExam(text).questions[0].options).toEqual(['100', '200', '300', '400']);
   });
 
+  it('reads options printed in two columns (A and C on one line, B and D on the next)', () => {
+    const text = [
+      '1. A bank ignores a rule. The bank will most likely',
+      'A. win awards. C. gain customers.',
+      'B. pay a fine. D. skip an audit.',
+      '2. Which is written in one column?',
+      'A. This one, because every option is long enough to need its own line',
+      'B. b',
+      'C. c',
+      'D. d',
+    ].join('\n');
+    const [first, second] = parseExam(text).questions;
+    expect(first.options).toEqual(['win awards.', 'pay a fine.', 'gain customers.', 'skip an audit.']);
+    expect(second.options).toEqual(['This one, because every option is long enough to need its own line', 'b', 'c', 'd']);
+  });
+
+  it('drops a stray ® from a copyright footer that is only on one page', () => {
+    const pages = [
+      ['1. First?', 'A. a', 'B. b', 'C. c', 'D. last option.', '®', 'Copyright © 2021 by MBA Research and Curriculum Center , Columbus, Ohio'],
+      ['2. Second?', 'A. a', 'B. b', 'C. c', 'D. d'],
+    ];
+    expect(parseExam(pages).questions[0].options[3]).toBe('last option.');
+  });
+
   it('keeps initials in a stem instead of splitting them into options', () => {
     const text = ['2. Mr. A. Smith and Ms. B. Jones own a firm. What is it?', 'A. a', 'B. b', 'C. c', 'D. d'].join('\n');
     const q = parseExam(text).questions[0];
@@ -318,6 +342,15 @@ describe('real DECA key layout', () => {
       cluster: 'Marketing',
       level: 'District',
     });
+  });
+
+  it('reads the season from a sample exam ("Posted online March 2019") and ICDC from "for use at DECA\'s ICDC"', () => {
+    const sample = ['SAMPLE', 'EXAM', 'FINANCE CAREER CLUSTER', 'THE FINANCE CAREER CLUSTER EXAM IS USED', 'Posted online March 2019 by DECA Inc.'];
+    expect(parseExam([...sample, text].join('\n')).info).toEqual({ cluster: 'Finance', year: 2019 });
+    expect(parseExam(['Finance Cluster Exam', 'Posted online October 2019 by DECA Inc.', text].join('\n')).info.year).toBe(2020);
+    const icdc = ['2025 HS ICDC', 'Finance Cluster Exam', "exclusively for DECA's 2024-2025 Competitive Events Program. Items in this exam were written",
+      'expressly for use at DECA’s ICDC. Performance indicators for this exam are at the prerequisite,'];
+    expect(parseExam([...icdc, text].join('\n')).info).toEqual({ cluster: 'Finance', year: 2025, level: 'ICDC' });
   });
 });
 

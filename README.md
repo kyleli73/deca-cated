@@ -45,6 +45,8 @@ saved exams and stats.
    these are filled in from the cover page ("Finance Cluster Exam",
    "2024-2025 Competitive Events Program", "for State/Province Use" =
    Association). The year is the spring year of the season, so 2024-25 is 2025.
+   Sample exams only say when they were posted ("Posted online March 2019"),
+   so that's 2019; they don't say a level, so check it.
 
 Questions you already have from another exam are linked, not copied, so your
 stats count each question once. If a repeated question's answer differs from
@@ -54,6 +56,16 @@ how many times you've completed each exam, your best score and when you last
 took it.
 
 Scanned PDFs (pictures of pages) have no text to read. Paste the text instead.
+
+### Import from links
+
+Instead of downloading PDFs yourself, paste their links into **PDF links** on
+the Import page (one per line; a pasted bulleted list works too) and click
+**Import N exams**. The app downloads each exam and opens it for checking; click
+**Save & next** to move to the next one. DECA's posted sample exams
+(`https://cdn.prod.website-files.com/…/…Sample_Exam….pdf`) download straight
+from the browser. For sites that block that, the app's local server downloads
+the file instead, so `npm run dev` or `npm run app` must be running.
 
 Want to try it first? Import `samples/finance-sample-exam.pdf` or paste
 `samples/finance-sample-exam-pasted.txt`. It's a 100-question practice exam
@@ -146,7 +158,10 @@ npm run check-pdf -- path/to/exam.pdf   # how the importer reads a PDF, without 
 
 The importer was checked against a real 2024-25 Finance Cluster exam (Test
 1312). All 100 questions, options, answers, explanations, codes, performance
-indicators and sources matched the PDF's text exactly. Real exams are
+indicators and sources matched the PDF's text exactly. It also reads DECA's
+posted Finance sample exams (2017–2021, Tests 1143, 1163, 1184, 1208 and 1229,
+including 1229's two-column answer choices) and the 2025 ICDC Finance exam with
+nothing flagged. Real exams are
 copyrighted by MBA Research, so they are not stored in this repository; the
 test fixtures copy their layout with made-up questions.
 
