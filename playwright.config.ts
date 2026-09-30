@@ -8,7 +8,7 @@ export default defineConfig({
   reporter: 'list',
   use: { ...devices['Desktop Chrome'], trace: 'retain-on-failure' },
   projects: [
-    { name: 'app', testMatch: /(app|news)\.spec\.ts/, use: { baseURL: 'http://localhost:5173' } },
+    { name: 'app', testMatch: /(app|news|calculator)\.spec\.ts/, use: { baseURL: 'http://localhost:5173' } },
     // The installable build, served the way `npm run app` serves it.
     { name: 'offline', testMatch: /offline\.spec\.ts/, use: { baseURL: 'http://localhost:4174' } },
   ],

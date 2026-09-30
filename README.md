@@ -76,6 +76,21 @@ During an exam, clicking an answer moves to the next question.
 
 **Save & exit** keeps your answers and time; resume from the Study page.
 
+### Calculator
+
+Click **Calculator** in the top bar (on any page, including during an exam).
+It docks on the right on a computer and along the bottom on a phone.
+
+- Type straight into it or click the keys. Brackets and the normal order of
+  operations work: `(12000-2000)/5` = 2,000.
+- `xʸ` is for compound interest: `1000×(1+0.05)^3` = 1,157.63.
+- `%` works like a phone calculator: `200+10%` = 220, `200×10%` = 20.
+- **Ans** is the last answer. Click any line in **History** to reuse it.
+- **Enter** = equals, **Backspace** deletes, **Delete** clears, **Esc** closes.
+
+While you're typing in the calculator, number keys never answer the question.
+Click the question again to go back to the A–D shortcuts.
+
 ## Wrong answers and Blooket
 
 **Wrong answers** lists every question you've missed, with your answer, the

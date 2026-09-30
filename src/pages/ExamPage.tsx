@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { CalculatorPanel, CalculatorToggle } from '../components/Calculator.tsx';
 import { db } from '../lib/db.ts';
 import { finishSession, saveProgress } from '../lib/repo.ts';
 import { formatClock } from '../lib/time.ts';
@@ -164,7 +165,8 @@ function ExamRunner({ session, questions }: { session: Session; questions: Quest
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
-      if ((e.target as HTMLElement).closest('input, textarea, select')) return;
+      // Typing into the calculator (or a form field) must never answer a question.
+      if (e.defaultPrevented || (e.target as HTMLElement).closest('input, textarea, select, .calculator')) return;
       const letter = KEYS[e.key.toLowerCase()];
       if (letter && indexRef.current < n) {
         e.preventDefault();
@@ -207,9 +209,12 @@ function ExamRunner({ session, questions }: { session: Session; questions: Quest
           <div className="exam-count swap-label" aria-live="polite" data-short={onSummary ? 'Review' : `${index + 1} / ${n}`}>
             {onSummary ? 'Review' : `Question ${index + 1} of ${n}`}
           </div>
-          <div className={`timer${remaining !== null && remaining <= 60 ? ' low' : ''}`} role="timer" aria-label="Time">
-            <span className="timer-label">{remaining === null ? 'Elapsed' : 'Left'}</span>
-            {formatClock(remaining ?? elapsed)}
+          <div className="exam-bar-right">
+            <CalculatorToggle />
+            <div className={`timer${remaining !== null && remaining <= 60 ? ' low' : ''}`} role="timer" aria-label="Time">
+              <span className="timer-label">{remaining === null ? 'Elapsed' : 'Left'}</span>
+              {formatClock(remaining ?? elapsed)}
+            </div>
           </div>
         </div>
         <div className="exam-progress" aria-hidden="true">
@@ -266,6 +271,7 @@ function ExamRunner({ session, questions }: { session: Session; questions: Quest
           </>
         )}
       </main>
+      <CalculatorPanel />
     </div>
   );
 }

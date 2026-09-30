@@ -1168,6 +1168,210 @@ table.data td.n {
   flex: 1;
 }
 
+/* -------------------------------------------------------------- calculator */
+
+.calc-toggle {
+  flex: none;
+  gap: 6px;
+}
+.calc-toggle.on {
+  color: var(--accent);
+  background: var(--accent-weak);
+}
+.exam-bar-right {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.exam-bar-right .timer {
+  justify-self: auto;
+}
+
+.calculator {
+  position: fixed;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 12px 40px rgba(17, 24, 39, 0.12);
+  outline: none;
+  overflow-y: auto;
+}
+.calculator:focus-visible {
+  border-color: var(--accent);
+}
+.calc-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.calc-screen {
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  text-align: right;
+  min-width: 0;
+}
+.calc-expr {
+  font-size: 14px;
+  color: var(--muted);
+  min-height: 21px;
+  overflow-wrap: anywhere;
+}
+.calc-result {
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.calc-result.preview {
+  color: var(--muted);
+}
+.calc-result.error {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--bad);
+  padding: 6px 0;
+}
+.calc-keys {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.calc-key {
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 17px;
+  font-weight: 500;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.calc-key:hover {
+  background: var(--soft);
+}
+.calc-key:active {
+  background: var(--line);
+}
+.calc-key.fn {
+  background: var(--soft);
+  font-size: 15px;
+  color: var(--ink-2);
+}
+.calc-key.op {
+  color: var(--accent);
+  font-size: 20px;
+}
+.calc-key.clear {
+  color: var(--bad);
+  font-size: 15px;
+}
+.calc-key.eq {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-size: 20px;
+}
+.calc-key.eq:hover {
+  background: var(--accent-hover);
+}
+.calc-history {
+  display: grid;
+  gap: 2px;
+  font-size: 13px;
+}
+.calc-history-head {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+.calc-history-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: var(--ink);
+}
+.calc-history-item:hover {
+  background: var(--soft);
+}
+.calc-history-expr {
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.calc-history-result {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Wide screens: docked on the right, and the page moves over to make room. */
+@media (min-width: 1100px) {
+  .calculator {
+    top: 72px;
+    right: 16px;
+    width: 300px;
+    max-height: calc(100vh - 88px);
+    border-radius: 16px;
+  }
+  body.calc-open .page {
+    margin-left: max(16px, calc((100vw - 332px - 920px) / 2));
+    margin-right: 332px;
+  }
+  body.calc-open .exam-main {
+    margin-left: max(16px, calc((100vw - 332px - 760px) / 2));
+    margin-right: 332px;
+  }
+}
+
+/* Narrow screens: a panel along the bottom, with room to scroll the page above it. */
+@media (max-width: 1099px) {
+  .calculator {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-height: 62vh;
+    border-radius: 16px 16px 0 0;
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
+  }
+  body.calc-open {
+    padding-bottom: 62vh;
+  }
+  .calc-history {
+    display: none;
+  }
+}
+@media (max-width: 640px) {
+  .calc-toggle-label {
+    display: none;
+  }
+  .calc-key {
+    height: 40px;
+  }
+}
+
 /* ------------------------------------------------------------------ mobile */
 
 @media (max-width: 640px) {

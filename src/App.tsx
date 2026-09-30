@@ -1,4 +1,5 @@
 import { HashRouter, Navigate, NavLink, Outlet, Route, Routes } from 'react-router-dom';
+import { CalculatorPanel, CalculatorToggle } from './components/Calculator.tsx';
 import ExamDetailPage from './pages/ExamDetailPage.tsx';
 import ExamPage from './pages/ExamPage.tsx';
 import ImportPage from './pages/ImportPage.tsx';
@@ -36,11 +37,14 @@ function Layout() {
               </NavLink>
             ))}
           </nav>
+          <span className="spacer" />
+          <CalculatorToggle />
         </div>
       </header>
       <main className="page">
         <Outlet />
       </main>
+      <CalculatorPanel />
     </>
   );
 }
