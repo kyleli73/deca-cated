@@ -28,7 +28,15 @@ export async function getSettings(): Promise<Settings> {
 }
 
 export async function updateSettings(patch: Partial<Omit<Settings, 'id'>>): Promise<void> {
-  await db.settings.put({ ...(await getSettings()), ...patch, id: 'settings' });
+  await modifySettings(() => patch);
+}
+
+/** Read-modify-write settings in one transaction, so quick successive changes can't overwrite each other. */
+export async function modifySettings(change: (current: Settings) => Partial<Omit<Settings, 'id'>>): Promise<void> {
+  await db.transaction('rw', db.settings, async () => {
+    const current = await getSettings();
+    await db.settings.put({ ...current, ...change(current), id: 'settings' });
+  });
 }
 
 /** Ask the browser not to evict our data under storage pressure. */

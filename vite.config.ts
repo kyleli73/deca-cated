@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { feedProxy } from './vite-plugins/feedProxy.ts';
 
 // Dev (`npm run dev`) and the installable build (`npm run app`) both use port
 // 5173. Browser storage is per address, so using one port means both see the
@@ -8,6 +9,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig({
   plugins: [
     react(),
+    feedProxy(),
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: false,

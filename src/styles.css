@@ -389,6 +389,9 @@ textarea:focus {
 
 .segmented {
   display: inline-flex;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
   padding: 3px;
   border-radius: 10px;
   background: var(--soft);
@@ -396,6 +399,7 @@ textarea:focus {
   gap: 2px;
 }
 .segmented button {
+  white-space: nowrap;
   height: 32px;
   padding: 0 14px;
   border: 0;
@@ -1072,6 +1076,96 @@ table.data td.n {
 .exam-row .title {
   font-weight: 600;
   color: var(--ink);
+}
+
+/* -------------------------------------------------------------------- news */
+
+.news-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+.news-list {
+  display: grid;
+  gap: 0;
+}
+.news-group {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin: 28px 0 4px;
+}
+.news-list > div:first-child .news-group {
+  margin-top: 0;
+}
+.news-item {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+  min-width: 0;
+}
+.news-item.compact {
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.news-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.news-title {
+  display: block;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ink);
+  letter-spacing: -0.005em;
+}
+.news-title:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+.news-item.read .news-title {
+  color: var(--muted);
+  font-weight: 500;
+}
+.news-summary {
+  margin: 6px 0 0;
+  font-size: 15px;
+  color: var(--ink-2);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.news-item.compact .news-summary {
+  -webkit-line-clamp: 3;
+}
+.news-tags {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+.source-list {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: grid;
+  gap: 8px;
+}
+.source-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.source-status {
+  flex: 1;
 }
 
 /* ------------------------------------------------------------------ mobile */

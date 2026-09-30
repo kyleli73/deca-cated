@@ -114,6 +114,28 @@ export interface Settings {
   /** Countdown shown on the Study page. */
   eventName: string;
   eventDate: string;
+  /** News sources you switched off (ids). */
+  newsDisabled: string[];
+  /** Feeds you added yourself. */
+  newsCustom: { id: string; name: string; url: string }[];
+  /** Last time news was refreshed (ms). */
+  newsFetchedAt: number;
+}
+
+/** A saved news article (cached so the News page works offline). */
+export interface NewsItem {
+  /** The article's link. */
+  id: string;
+  /** Every source that lists it (the same story can be in two feeds). */
+  sourceIds: string[];
+  title: string;
+  summary: string;
+  /** Publication time if the source gives one. */
+  published: number | null;
+  /** First time this app saw it; used to order undated articles. */
+  firstSeenAt: number;
+  audio: boolean;
+  readAt?: number;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -123,4 +145,7 @@ export const DEFAULT_SETTINGS: Settings = {
   secondsPerQuestion: 42,
   eventName: 'Regionals',
   eventDate: '2026-11-22',
+  newsDisabled: [],
+  newsCustom: [],
+  newsFetchedAt: 0,
 };

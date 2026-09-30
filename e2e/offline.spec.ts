@@ -24,3 +24,9 @@ test('the installed build works offline, including PDF import', async ({ page, c
   await expect(page.locator('.tag', { hasText: '100 questions' })).toBeVisible();
   await context.setOffline(false);
 });
+
+test('the installed build has the news fetcher too', async ({ request }) => {
+  const res = await request.get(`/api/fetch?url=${encodeURIComponent('ftp://example.com/feed')}`);
+  expect(res.status()).toBe(400);
+  expect(await res.text()).toBe('Only http and https addresses can be fetched.');
+});

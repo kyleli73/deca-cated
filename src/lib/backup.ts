@@ -63,4 +63,5 @@ export async function eraseAll(): Promise<void> {
   await db.transaction('rw', [...TABLES], async () => {
     for (const t of TABLES) await db[t].clear();
   });
+  await db.news.clear();
 }

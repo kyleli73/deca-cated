@@ -1,5 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie';
-import type { Attempt, Exam, Question, ReviewCard, Session, Settings } from './types.ts';
+import type { Attempt, Exam, NewsItem, Question, ReviewCard, Session, Settings } from './types.ts';
 
 export type StudyDB = Dexie & {
   exams: EntityTable<Exam, 'id'>;
@@ -8,6 +8,7 @@ export type StudyDB = Dexie & {
   attempts: EntityTable<Attempt, 'id'>;
   reviews: EntityTable<ReviewCard, 'questionId'>;
   settings: EntityTable<Settings, 'id'>;
+  news: EntityTable<NewsItem, 'id'>;
 };
 
 export const TABLES = ['exams', 'questions', 'sessions', 'attempts', 'reviews', 'settings'] as const;
@@ -22,6 +23,8 @@ export function openDB(name = 'deca-study'): StudyDB {
     reviews: 'questionId, due',
     settings: 'id',
   });
+  // v2: saved news articles (a cache, so it isn't part of backups).
+  db.version(2).stores({ news: 'id, *sourceIds, firstSeenAt' });
   return db;
 }
 

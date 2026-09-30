@@ -86,6 +86,27 @@ correct answer and the explanation. From there:
   **CSV Import**, and upload the file. Blooket takes the questions and
   answers; the explanations stay in DECA Study.
 
+## News
+
+**News** collects business, finance and DECA reading for between study
+sessions:
+
+- **DECA:** the latest articles from DECA Direct.
+- **Business news:** CBC Business, BBC Business and NPR Business.
+- **Economy explained:** NPR's *The Indicator* and *Planet Money*, short
+  explainers on the economy and business.
+
+Each article shows which DECA instructional areas it touches on (like
+Economics or Business Law). Under **Sources** you can switch sources off or add
+any site's RSS feed.
+
+News sites don't let web pages read their feeds directly, so the app's own
+local server (the one `npm run dev` or `npm run app` starts) fetches them for
+you. It runs only on your computer, only answers DECA Study itself, and only
+fetches public addresses. Articles are saved, so if you open the installed app
+without the server running, or you're offline, you still see the last ones
+loaded.
+
 ## Back up your data
 
 Your data lives in this browser on this computer. Clearing the browser's site

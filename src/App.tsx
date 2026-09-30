@@ -4,6 +4,7 @@ import ExamPage from './pages/ExamPage.tsx';
 import ImportPage from './pages/ImportPage.tsx';
 import LibraryPage from './pages/LibraryPage.tsx';
 import MistakesPage from './pages/MistakesPage.tsx';
+import NewsPage from './pages/NewsPage.tsx';
 import ResultsPage from './pages/ResultsPage.tsx';
 import SettingsPage from './pages/SettingsPage.tsx';
 import StatsPage from './pages/StatsPage.tsx';
@@ -13,6 +14,7 @@ const NAV = [
   { to: '/', label: 'Study', end: true },
   { to: '/mistakes', label: 'Wrong answers' },
   { to: '/stats', label: 'Stats' },
+  { to: '/news', label: 'News' },
   { to: '/library', label: 'Library' },
   { to: '/import', label: 'Import' },
   { to: '/settings', label: 'Settings' },
@@ -52,6 +54,7 @@ export default function App() {
           <Route index element={<StudyPage />} />
           <Route path="mistakes" element={<MistakesPage />} />
           <Route path="stats" element={<StatsPage />} />
+          <Route path="news" element={<NewsPage />} />
           <Route path="library" element={<LibraryPage />} />
           <Route path="library/:id" element={<ExamDetailPage />} />
           <Route path="import" element={<ImportPage />} />
