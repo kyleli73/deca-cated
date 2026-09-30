@@ -39,6 +39,8 @@ export interface Question {
   source: string;
   /** Performance-indicator code from the key, e.g. "FI:093". */
   piCode: string;
+  /** Performance indicator text from the key, e.g. "Explain types of financial markets". */
+  piTitle?: string;
   /** Instructional-area prefix of piCode, e.g. "FI". Empty if unknown. */
   area: string;
   /** Every exam this question appears in (duplicates are linked, not copied). */

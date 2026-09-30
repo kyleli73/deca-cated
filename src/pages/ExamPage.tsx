@@ -229,7 +229,8 @@ function ExamRunner({ session, questions }: { session: Session; questions: Quest
           <>
             <div className="qnum">Question {index + 1}</div>
             <h1 className="stem">{q.stem}</h1>
-            <div className="options" role="group" aria-label="Answer options">
+            {/* Keyed by question so the previous selection doesn't fade out on the next one. */}
+            <div className="options" role="group" aria-label="Answer options" key={index}>
               {q.options.map((o, i) => {
                 const letter = LETTERS[i];
                 const selected = answers[index] === letter;

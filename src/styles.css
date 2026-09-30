@@ -586,8 +586,11 @@ textarea:focus {
     border-color 0.1s,
     background 0.1s;
 }
-.option:hover {
-  border-color: var(--accent);
+/* Hover only where there is a real pointer; on touch screens it sticks to the tapped option. */
+@media (hover: hover) {
+  .option:hover {
+    border-color: var(--accent);
+  }
 }
 .option.selected {
   border-color: var(--accent);
@@ -1035,7 +1038,7 @@ table.data td.n {
   margin: 0;
 }
 .qedit .fields {
-  grid-template-columns: 1fr 160px;
+  grid-template-columns: 160px 1fr;
 }
 
 .sticky-actions {

@@ -48,15 +48,19 @@ function capsRatio(text: string): number {
 const EDGE = 3;
 
 export function markNoise(lines: Line[], pageCount: number): boolean[] {
+  // Running headers/footers sit in the same slot on every page ("1st line",
+  // "2nd from the bottom"); content only lands near an edge by chance.
+  const slot = (l: Line) => (l.pos < EDGE ? `t${l.pos}` : l.pos >= l.pageLen - EDGE ? `b${l.pageLen - 1 - l.pos}` : '');
   const total = new Map<string, number>();
   const pagesWithEdge = new Map<string, Set<number>>();
   for (const l of lines) {
     const sig = signature(l.text);
     total.set(sig, (total.get(sig) ?? 0) + 1);
-    if (l.pos < EDGE || l.pos >= l.pageLen - EDGE) {
-      const set = pagesWithEdge.get(sig) ?? new Set<number>();
+    const at = slot(l);
+    if (at) {
+      const set = pagesWithEdge.get(`${at}|${sig}`) ?? new Set<number>();
       set.add(l.page);
-      pagesWithEdge.set(sig, set);
+      pagesWithEdge.set(`${at}|${sig}`, set);
     }
   }
   const pageThreshold = Math.max(2, Math.ceil(pageCount * 0.3));
@@ -66,13 +70,19 @@ export function markNoise(lines: Line[], pageCount: number): boolean[] {
     if (isCopyright(text)) return true;
     if (STRUCTURAL.test(text) || isPageNumber(text)) return false; // page numbers: second pass
     const sig = signature(text);
-    const atEdge = l.pos < EDGE || l.pos >= l.pageLen - EDGE;
+    const at = slot(l);
 
     const words = sig.split(' ').filter(Boolean).length;
     const short = text.length <= 60 && words <= 8;
 
-    // Real PDF pages: a short line repeated at the top/bottom of many pages.
-    if (pageCount > 1 && atEdge && short && (pagesWithEdge.get(sig)?.size ?? 0) >= pageThreshold) return true;
+    // Real PDF pages: a short line repeated in the same top/bottom slot of many
+    // pages that also looks like furniture: it carries a (page/test) number, is
+    // ALL CAPS, is just a symbol like "®", or is on most pages. A citation that
+    // often ends a page ("Northlake Press.") is none of these.
+    const onPages = pagesWithEdge.get(`${at}|${sig}`)?.size ?? 0;
+    if (pageCount > 1 && at && short && onPages >= pageThreshold) {
+      if (sig.includes('#') || !sig || capsRatio(text) >= 0.6 || onPages >= pageCount * 0.5) return true;
+    }
 
     // Pasted text: running headers still repeat, and are ALL CAPS or "Test 1255".
     if ((total.get(sig) ?? 0) >= 3 && short) {

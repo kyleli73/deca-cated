@@ -60,10 +60,16 @@ test('full exam run-through: import a PDF, take the exam, review, stats and mist
   await expect(page.getByRole('heading', { name: 'Check the questions' })).toBeVisible();
   await expect(page.locator('.tag', { hasText: '100 questions' })).toBeVisible();
   await expect(page.getByText('need fixing')).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'Save exam' })).toBeDisabled(); // year not set yet
+  // Tags come from the cover page ("for State/Province Use", "2025-2026 Competitive Events Program").
+  await expect(page.getByLabel('Year')).toHaveValue('2026');
+  await expect(page.getByLabel('Level')).toHaveValue('Association');
+  await expect(page.getByText('Title will be “Finance 2026 Association · Test 9123”')).toBeVisible();
+  await page.getByLabel('Year').fill('');
+  await expect(page.getByRole('button', { name: 'Save exam' })).toBeDisabled(); // year is required
   await page.getByLabel('Year').fill('2025');
+  await page.getByLabel('Level').selectOption('District');
   await page.getByRole('button', { name: 'Save exam' }).click();
-  await expect(page.getByText('Saved “Finance 2025 District”.')).toBeVisible();
+  await expect(page.getByText('Saved “Finance 2025 District · Test 9123”.')).toBeVisible();
   await expect(page.getByText('1 exam · 100 unique questions')).toBeVisible();
 
   // Start the stored exam: 70:00 countdown, question 1.
@@ -77,7 +83,7 @@ test('full exam run-through: import a PDF, take the exam, review, stats and mist
   for (let i = 0; i < 100; i++) {
     if (i === 50) {
       await page.getByRole('link', { name: /Save & exit/ }).click();
-      await expect(page.getByText('Unfinished: Finance 2025 District')).toBeVisible();
+      await expect(page.getByText('Unfinished: Finance 2025 District · Test 9123')).toBeVisible();
       await expect(page.getByText(/50 of 100 answered/)).toBeVisible();
       await page.getByRole('link', { name: 'Resume' }).click();
       await expect(page.getByText('Question 51 of 100')).toBeVisible();

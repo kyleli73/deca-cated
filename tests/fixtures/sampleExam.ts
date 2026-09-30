@@ -17,6 +17,7 @@ export interface SampleQuestion {
   explanation: string;
   source: string;
   piCode: string;
+  piTitle: string;
 }
 
 interface Item {
@@ -25,6 +26,8 @@ interface Item {
   wrong: [string, string, string];
   explanation: string;
   code: string;
+  /** Performance indicator text printed after the code; long ones wrap like real keys. */
+  pi?: string;
   source: string;
 }
 
@@ -47,6 +50,7 @@ const ITEMS: Item[] = [
     explanation:
       "Current ratio. The current ratio measures a business's ability to pay its short-term debts. It is calculated by dividing current assets by current liabilities: $150,000 ÷ $60,000 = 2.5.",
     code: 'FI:093',
+    pi: 'Calculate financial ratios (e.g., current ratio, quick ratio, debt-to-equity ratio, working capital, etc.)',
     source: finance('212-214'),
   },
   {
@@ -56,6 +60,7 @@ const ITEMS: Item[] = [
     explanation:
       "Income statement. The income statement shows the revenues earned and the expenses incurred during a period, and the resulting net income or net loss. A balance sheet shows a business's financial position at one point in time.",
     code: 'FI:094',
+    pi: 'Explain the purpose and importance of the income statement',
     source: finance('188-190'),
   },
   {
@@ -83,6 +88,7 @@ const ITEMS: Item[] = [
     explanation:
       "Depreciation. Depreciation spreads the cost of a long-term tangible asset over the years the asset is used to earn revenue. Appreciation is an increase in an asset's value.",
     code: 'FI:085',
+    pi: 'Explain the nature of depreciation',
     source: finance('160-161'),
   },
   {
@@ -110,6 +116,7 @@ const ITEMS: Item[] = [
     explanation:
       'Simple interest. Simple interest is calculated as principal × rate × time: $2,000 × 0.05 × 3 = $300. Compound interest would earn slightly more because interest would also be earned on interest.',
     code: 'FI:062',
+    pi: 'Explain the time value of money',
     source: finance('58-60'),
   },
   {
@@ -164,6 +171,7 @@ const ITEMS: Item[] = [
     explanation:
       'Diversification. Diversification reduces risk because poor performance by one investment may be offset by better performance from others. It is often summarized as not putting all of your eggs in one basket.',
     code: 'FI:081',
+    pi: 'Explain types of investments (e.g., stocks, bonds, mutual funds, real estate, commodities, etc.)',
     source: finance('262-263'),
   },
   {
@@ -191,6 +199,7 @@ const ITEMS: Item[] = [
     explanation:
       "Statement of cash flows. Investing activities include buying and selling long-term assets such as equipment, buildings, and investments. Operating activities relate to day-to-day business, and financing activities involve borrowing and owners' investments.",
     code: 'FI:096',
+    pi: 'Describe the nature of cash flow statements',
     source: finance('200-203'),
   },
   {
@@ -372,6 +381,7 @@ const ITEMS: Item[] = [
     explanation:
       'Contract elements. An enforceable contract requires an offer, acceptance, consideration (something of value exchanged), competent parties, and a legal purpose. Many contracts are enforceable even if they are oral.',
     code: 'BL:069',
+    pi: 'Describe legal issues affecting businesses',
     source: law('88-90'),
   },
   {
@@ -445,6 +455,7 @@ const ITEMS: Item[] = [
     explanation:
       "Scarcity. Because there are not enough resources to satisfy everyone's wants, individuals, businesses, and governments must make choices about how to use them.",
     code: 'EC:001',
+    pi: 'Explain the concept of economic resources',
     source: econ('4'),
   },
   {
@@ -527,6 +538,7 @@ const ITEMS: Item[] = [
     explanation:
       "Active listening. Active listeners give the speaker their full attention and confirm their understanding, for example by paraphrasing or asking clarifying questions. Planning a reply or interrupting shows the listener isn't focused on the speaker.",
     code: 'CO:017',
+    pi: 'Demonstrate active listening skills',
     source: skills('12-14'),
   },
   {
@@ -664,6 +676,7 @@ const ITEMS: Item[] = [
     explanation:
       "Conflict resolution. Most workplace conflicts are best resolved when the people involved talk calmly, listen to each other's views, and look for a solution both can accept.",
     code: 'EI:015',
+    pi: 'Use conflict-resolution skills (e.g., identify the source of the conflict, suggest solutions, reach agreement, etc.)',
     source: skills('110-112'),
   },
   {
@@ -710,6 +723,7 @@ const ITEMS: Item[] = [
     explanation:
       'Phishing. Phishing messages impersonate trusted organizations to trick people into revealing passwords, account numbers, or other personal information. Banks do not ask customers to confirm passwords by email.',
     code: 'NF:110',
+    pi: 'Explain the nature of cybersecurity risks to a business',
     source: ops('40-41'),
   },
   {
@@ -847,6 +861,7 @@ const ITEMS: Item[] = [
     explanation:
       'Business ethics. Accepting a gift meant to influence your decisions creates a conflict of interest. Most financial institutions have policies that require employees to decline such gifts or report them.',
     code: 'PD:251',
+    pi: 'Demonstrate ethical work habits',
     source: skills('160-162'),
   },
   // ---------------------------------------------------------- Risk Management
@@ -884,6 +899,7 @@ const ITEMS: Item[] = [
     explanation:
       'Risk transfer. Buying insurance shifts the financial burden of a possible loss from the business to the insurance company in exchange for a premium.',
     code: 'RM:043',
+    pi: 'Explain ways to transfer risk to others (e.g., insurance, contracts, warranties, hedging, etc.)',
     source: finance('316-317'),
   },
   // ---------------------------------------------------- Strategic Management
@@ -894,6 +910,7 @@ const ITEMS: Item[] = [
     explanation:
       'SWOT analysis. Strengths and weaknesses are internal to the company, while opportunities and threats come from the external environment. A new competitor is an external factor that could hurt the business.',
     code: 'SM:007',
+    pi: 'Conduct a SWOT analysis for use in the planning process',
     source: ops('12-14'),
   },
   {
@@ -993,6 +1010,7 @@ function build(): SampleQuestion[] {
       explanation: item.explanation,
       source: item.source,
       piCode: item.code,
+      piTitle: item.pi ?? '',
     };
   });
 }
@@ -1000,7 +1018,9 @@ function build(): SampleQuestion[] {
 export const SAMPLE_QUESTIONS: SampleQuestion[] = build();
 
 export const SAMPLE_PREAMBLE = [
-  'FINANCE CLUSTER EXAM',
-  'SAMPLE PRACTICE EXAM',
+  'Written Exam for State/Province Use',
+  'Test Number 9123',
+  'Finance Cluster Exam',
+  'This sample was prepared for the 2025-2026 Competitive Events Program format.',
   'Written to test the DECA Study importer. This is practice content, not an official DECA or MBA Research exam, and the textbook sources are fictional.',
 ];

@@ -49,6 +49,13 @@ export function joinLines(lines: string[], vocab: Set<string> = new Set()): stri
       out = line;
       continue;
     }
+    // A URL broken across lines is re-joined exactly: no space, hyphen kept.
+    const lastToken = out.slice(out.lastIndexOf(' ') + 1);
+    const nextToken = line.split(' ')[0];
+    if (/:\/\/|^www\./i.test(lastToken) && (/[-/_.=?&%#~]$/.test(lastToken) || /^[\w~%-]*[/._=?&-][\w./~%?=&#-]*$/.test(nextToken))) {
+      out += line;
+      continue;
+    }
     const hyphen = /([A-Za-z]+)-$/.exec(out);
     const next = /^([a-z]+)/.exec(line);
     if (hyphen && next) {

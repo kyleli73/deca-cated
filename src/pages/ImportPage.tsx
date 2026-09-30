@@ -58,6 +58,7 @@ export default function ImportPage() {
   const fileInput = useRef<HTMLInputElement>(null);
   const dupeRequest = useRef(0);
   const fpCache = useRef(new WeakMap<Item, string>());
+  const [testNumber, setTestNumber] = useState('');
 
   const load = (input: string | string[][], fileName?: string) => {
     const result = parseExam(input);
@@ -70,7 +71,11 @@ export default function ImportPage() {
     setReplace(new Set());
     setDupes(new Map());
     setFlagged(null);
-    setMeta((m) => ({ ...m, ...(fileName ? guessMeta(fileName) : {}), fileName }));
+    // The cover page ("Finance Cluster Exam", "2024-2025 Competitive Events
+    // Program", "for State/Province Use") beats guessing from the file name.
+    const { testNumber: test, ...info } = result.info;
+    setMeta((m) => ({ ...m, ...(fileName ? guessMeta(fileName) : {}), ...info, fileName }));
+    setTestNumber(test ?? '');
     setError('');
     setStep('review');
     window.scrollTo({ top: 0 });
@@ -139,7 +144,7 @@ export default function ImportPage() {
     [],
   );
 
-  const autoTitle = `${meta.cluster} ${meta.year || ''} ${meta.level}`.replace(/\s+/g, ' ').trim();
+  const autoTitle = `${meta.cluster} ${meta.year || ''} ${meta.level}${testNumber ? ` · Test ${testNumber}` : ''}`.replace(/\s+/g, ' ').trim();
   const isError = (q: Item) => issues.get(q.key)!.some((i) => i.level === 'error');
   const errorCount = items.filter(isError).length;
   const warnCount = items.filter((q) => !isError(q) && issues.get(q.key)!.length > 0).length;

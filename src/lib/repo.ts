@@ -87,6 +87,7 @@ function toQuestionFields(q: EditableQuestion) {
     explanation: q.explanation.trim(),
     source: q.source.trim(),
     piCode,
+    piTitle: (q.piTitle ?? '').trim(),
     area: areaOf(piCode),
     fingerprint: fingerprint(q.stem, q.options),
   };

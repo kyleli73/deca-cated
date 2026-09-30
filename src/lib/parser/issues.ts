@@ -7,6 +7,7 @@ export interface EditableQuestion {
   explanation: string;
   source: string;
   piCode: string;
+  piTitle?: string;
 }
 
 export interface Issue {

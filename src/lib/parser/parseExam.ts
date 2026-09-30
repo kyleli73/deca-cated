@@ -1,4 +1,4 @@
-import { LETTERS, type Letter } from '../types.ts';
+import { LETTERS, type Cluster, type Letter, type Level } from '../types.ts';
 import { buildVocab, cleanLine, joinLines } from './normalize.ts';
 import { markNoise, type Line } from './noise.ts';
 
@@ -10,6 +10,16 @@ export interface ParsedQuestion {
   explanation: string;
   source: string;
   piCode: string;
+  /** Performance indicator text after the code, e.g. "Explain types of financial markets". */
+  piTitle: string;
+}
+
+/** What the cover page says about the exam, used to pre-fill its tags. */
+export interface ExamInfo {
+  cluster?: Cluster;
+  year?: number;
+  level?: Level;
+  testNumber?: string;
 }
 
 export interface ParseResult {
@@ -17,6 +27,7 @@ export interface ParseResult {
   /** Problems with the exam as a whole (missing numbers, no key, …). */
   warnings: string[];
   keyFound: boolean;
+  info: ExamInfo;
 }
 
 const Q_START = /^(\d{1,3})\s*[.)]\s*(.*)$/;
@@ -188,7 +199,9 @@ interface KeyDraft {
   explanation: string[];
   sources: string[][];
   code: string;
-  inSources: boolean;
+  indicator: string[];
+  /** Which part a wrapped continuation line belongs to. */
+  in: 'explanation' | 'indicator' | 'source';
 }
 
 function parseKey(lines: string[]): { entries: Map<number, KeyDraft>; duplicates: number[] } {
@@ -204,7 +217,8 @@ function parseKey(lines: string[]): { entries: Map<number, KeyDraft>; duplicates
       explanation: rest ? [rest] : [],
       sources: [],
       code: '',
-      inSources: false,
+      indicator: [],
+      in: 'explanation',
     };
     if (entries.has(n)) duplicates.push(n);
     entries.set(n, d);
@@ -226,27 +240,28 @@ function parseKey(lines: string[]): { entries: Map<number, KeyDraft>; duplicates
     }
     if (!cur) continue;
 
+    // "SOURCE: FI:337 Explain types of financial markets (e.g., …" or a bare "FI:337" line.
     const src = SOURCE_LINE.exec(text);
-    if (src) {
-      const content = src[1].trim();
-      const code = CODE_AT_START.exec(content);
-      if (code) {
-        if (!cur.code) cur.code = `${code[1]}:${code[2]}`;
-      } else if (content) {
-        cur.sources.push([content]);
+    const content = src ? src[1].trim() : text;
+    const code = CODE_AT_START.exec(content);
+    if (code && (src || text.length <= 160)) {
+      if (!cur.code) {
+        cur.code = `${code[1]}:${code[2]}`;
+        const title = content.slice(code[0].length).replace(/^[\s\u2013\u2014:-]+/, '');
+        cur.indicator = title ? [title] : [];
       }
-      cur.inSources = true;
+      cur.in = 'indicator';
+      continue;
+    }
+    if (src) {
+      if (content) cur.sources.push([content]);
+      cur.in = 'source';
       continue;
     }
 
-    const bareCode = CODE_AT_START.exec(text);
-    if (bareCode && text.length <= 120) {
-      if (!cur.code) cur.code = `${bareCode[1]}:${bareCode[2]}`;
-      cur.inSources = true;
-      continue;
-    }
-
-    if (cur.inSources && cur.sources.length) cur.sources[cur.sources.length - 1].push(text);
+    // A wrapped line continues whatever came before it.
+    if (cur.in === 'source' && cur.sources.length) cur.sources[cur.sources.length - 1].push(text);
+    else if (cur.in === 'indicator') cur.indicator.push(text);
     else cur.explanation.push(text);
   }
   return { entries, duplicates };
@@ -319,8 +334,42 @@ export function parseExam(input: string | string[][]): ParseResult {
       explanation,
       source,
       piCode,
+      piTitle: e ? joinLines(e.indicator, vocab) : '',
     };
   });
 
-  return { questions, warnings, keyFound: entries.size > 0 };
+  return { questions, warnings, keyFound: entries.size > 0, info: examInfo(lines.slice(0, Math.max(0, firstQuestion)).map((l) => l.text)) };
+}
+
+const CLUSTER_NAMES: [RegExp, Cluster][] = [
+  [/personal financial literacy/i, 'Personal Financial Literacy'],
+  [/hospitality/i, 'Hospitality & Tourism'],
+  [/entrepreneurship/i, 'Entrepreneurship'],
+  [/business management/i, 'Business Management & Admin'],
+  [/business admin\w*\s+core|principles/i, 'Business Admin Core'],
+  [/marketing/i, 'Marketing'],
+  [/finance/i, 'Finance'],
+];
+
+/** Read the cover page: "Finance Cluster Exam", "2024-2025 Competitive Events Program", "for State/Province Use", "Test Number 1312". */
+export function examInfo(cover: string[]): ExamInfo {
+  const info: ExamInfo = {};
+  for (const line of cover) {
+    const cluster = /\bexam\b/i.test(line) ? CLUSTER_NAMES.find(([re]) => re.test(line)) : undefined;
+    if (cluster) {
+      info.cluster = cluster[1];
+      break;
+    }
+  }
+  const text = cover.join('\n');
+  const season = /(20\d\d)\s*[-\u2013\u2014/]\s*(20\d\d)\s+competitive events/i.exec(text);
+  if (season) info.year = Number(season[2]);
+  // "Written Exam for State/Province Use". (Every cover mentions the "chartered association advisor", so match the phrase.)
+  const use = /\bfor\s+([\w/ ]{2,30}?)\s+use\b/i.exec(text)?.[1] ?? '';
+  if (/ICDC|international/i.test(use)) info.level = 'ICDC';
+  else if (/state|province|association/i.test(use)) info.level = 'Association';
+  else if (/district|regional|chapter/i.test(use)) info.level = 'District';
+  const test = /\btest\s+(?:number\s+)?(\d{3,5})\b/i.exec(text);
+  if (test) info.testNumber = test[1];
+  return info;
 }

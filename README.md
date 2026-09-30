@@ -41,7 +41,10 @@ saved exams and stats.
      saving.
    - **Amber** warnings (no explanation, no code, an option that looks too
      long) are optional.
-4. Tag the exam with its cluster, year and level, then save.
+4. Check the exam's cluster, year and level, then save. For DECA exam PDFs
+   these are filled in from the cover page ("Finance Cluster Exam",
+   "2024-2025 Competitive Events Program", "for State/Province Use" =
+   Association). The year is the spring year of the season, so 2024-25 is 2025.
 
 Questions you already have from another exam are linked, not copied, so your
 stats count each question once. If a repeated question's answer differs from
@@ -100,7 +103,14 @@ npm test            # unit tests: parser, storage, stats, spaced repetition, bac
 npm run test:e2e    # browser tests: full exam run-through, import review, timer, backup, offline
 npm run typecheck
 npm run samples     # regenerate samples/ from tests/fixtures/sampleExam.ts
+npm run check-pdf -- path/to/exam.pdf   # how the importer reads a PDF, without the app
 ```
+
+The importer was checked against a real 2024-25 Finance Cluster exam (Test
+1312). All 100 questions, options, answers, explanations, codes, performance
+indicators and sources matched the PDF's text exactly. Real exams are
+copyrighted by MBA Research, so they are not stored in this repository; the
+test fixtures copy their layout with made-up questions.
 
 Built with Vite, React, TypeScript, Dexie (IndexedDB), pdf.js and
 vite-plugin-pwa.

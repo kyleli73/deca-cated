@@ -107,6 +107,7 @@ describe('parseExam on hand-written messy text', () => {
         explanation: 'Current assets. Receivables are expected to be collected within a year.',
         source: 'Rivera, M. (2024). Principles of finance [pp. 1-2].',
         piCode: 'FI:073',
+        piTitle: '',
       },
       {
         number: 2,
@@ -116,6 +117,7 @@ describe('parseExam on hand-written messy text', () => {
         explanation: 'Budgets. A budget is a financial plan.',
         source: '',
         piCode: 'FI:106',
+        piTitle: '',
       },
       {
         number: 3,
@@ -125,6 +127,7 @@ describe('parseExam on hand-written messy text', () => {
         explanation: 'Cost increase. $1,200 ÷ 1.5 = $800, so the rise is $400.',
         source: 'Practice Press. (2025). Economics for business [p. 4].',
         piCode: 'FI:080',
+        piTitle: '',
       },
     ]);
     expect(r.warnings).toEqual(['Found 3 questions. DECA exams usually have 100.']);
@@ -272,11 +275,66 @@ describe('parseExam on hand-written messy text', () => {
   });
 });
 
+describe('real DECA key layout', () => {
+  // Same structure as a real MBA Research key (content is made up): the
+  // performance indicator after the code wraps onto a second line, and the
+  // citation wraps with a URL.
+  const text = [
+    '1. Which of the following is a type of financial market:',
+    'A. Supply chain',
+    'B. Commodities market',
+    'C. Labor union',
+    'D. Trade show',
+    'KEY',
+    'Test Number 1234',
+    '1. B',
+    'Commodities market. Commodities are raw products such as energy, metals, and grains that trade on',
+    'their own markets.',
+    'SOURCE: FI:337 Explain types of financial markets (e.g., money market, capital market, insurance market,',
+    'commodities markets, etc.)',
+    'SOURCE: Writer, A. (2024, March 4). Markets: An overview. Retrieved September 27, 2024,',
+    'from https://example.com/markets-',
+    'overview/',
+  ].join('\n');
+
+  it('keeps a wrapped performance indicator out of the explanation', () => {
+    const q = parseExam(text).questions[0];
+    expect(q.explanation).toBe(
+      'Commodities market. Commodities are raw products such as energy, metals, and grains that trade on their own markets.',
+    );
+    expect(q.piCode).toBe('FI:337');
+    expect(q.piTitle).toBe(
+      'Explain types of financial markets (e.g., money market, capital market, insurance market, commodities markets, etc.)',
+    );
+    expect(q.source).toBe('Writer, A. (2024, March 4). Markets: An overview. Retrieved September 27, 2024, from https://example.com/markets-overview/');
+  });
+
+  it('reads cluster, season, level and test number from the cover page', () => {
+    const cover = ['Competency-Based', '*Written Exam*', 'for State/Province Use', 'Test Number 1312', 'Finance Cluster Exam',
+      "This comprehensive exam was developed exclusively for DECA's", '2024-2025 Competitive Events Program. A key has been',
+      'provided to the DECA chartered association advisor.'];
+    expect(parseExam([...cover, text].join('\n')).info).toEqual({ cluster: 'Finance', year: 2025, level: 'Association', testNumber: '1312' });
+    expect(parseExam(['for District Use', 'Marketing Cluster Exam', 'chartered association advisor', text].join('\n')).info).toEqual({
+      cluster: 'Marketing',
+      level: 'District',
+    });
+  });
+});
+
 describe('normalize helpers', () => {
   it('keeps real hyphenated compounds and removes typesetting hyphens', () => {
     const vocab = buildVocab(['financial planning is financial']);
     expect(joinLines(['long-', 'term'], vocab)).toBe('long-term');
     expect(joinLines(['finan-', 'cial'], vocab)).toBe('financial');
+  });
+
+  it('re-joins URLs broken across lines exactly', () => {
+    const vocab = buildVocab(['see investopedia.com/terms/r/retainedearnings.asp']);
+    expect(joinLines(['from http://a.com/calculate-dividends-retained-', 'earnings-statement-19419.html'], vocab)).toBe(
+      'from http://a.com/calculate-dividends-retained-earnings-statement-19419.html',
+    );
+    expect(joinLines(['from https://a.com/resources/', 'cost-allocation'])).toBe('from https://a.com/resources/cost-allocation');
+    expect(joinLines(['from https://a.com/page', 'Retrieved later'])).toBe('from https://a.com/page Retrieved later');
   });
 
   it('fixes ligatures, odd spaces and soft hyphens', () => {

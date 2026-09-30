@@ -30,6 +30,9 @@ describe('PDF import through pdf.js', () => {
     const pages = await extract(await renderPdf(SAMPLE_QUESTIONS));
     expect(pages.length).toBeGreaterThan(10);
     const result = parseExam(pages);
+    expect(pages[0]).toContain('for State/Province Use');
+    expect(pages.flat()).toContain('\u00AE'); // the superscript really is its own line
+    expect(result.info).toEqual({ cluster: 'Finance', year: 2026, level: 'Association', testNumber: '9123' });
     expect(result.warnings).toEqual([]);
     expect(result.questions).toHaveLength(100);
     result.questions.forEach((q, i) => expect(q).toEqual(SAMPLE_QUESTIONS[i]));

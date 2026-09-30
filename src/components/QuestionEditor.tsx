@@ -110,14 +110,18 @@ export function QuestionEditor({
         </label>
         <div className="fields">
           <label className="field">
-            Source
-            <input type="text" value={value.source} onChange={(e) => set({ source: e.target.value })} />
-          </label>
-          <label className="field">
             Code
             <input type="text" value={value.piCode} placeholder="FI:093" onChange={(e) => set({ piCode: e.target.value })} />
           </label>
+          <label className="field">
+            Performance indicator
+            <input type="text" value={value.piTitle ?? ''} onChange={(e) => set({ piTitle: e.target.value })} />
+          </label>
         </div>
+        <label className="field">
+          Source
+          <input type="text" value={value.source} onChange={(e) => set({ source: e.target.value })} />
+        </label>
       </div>
     </div>
   );

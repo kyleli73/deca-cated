@@ -53,6 +53,7 @@ export function QuestionReview({
         {question.piCode && (
           <span>
             {question.piCode} · {areaName(question.area)}
+            {question.piTitle && ` · ${question.piTitle}`}
           </span>
         )}
         {question.source && <span>Source: {question.source}</span>}

@@ -1,7 +1,9 @@
 FINANCE CLUSTER EXAM
 Test 9123
-FINANCE CLUSTER EXAM
-SAMPLE PRACTICE EXAM
+Written Exam for State/Province Use
+Test Number 9123
+Finance Cluster Exam
+This sample was prepared for the 2025-2026 Competitive Events Program format.
 Written to test the DECA Study importer. This is practice content, not an official DECA or MBA Research exam, and the textbook sources are fictional.
 
 1. Converting data into a code so that it cannot be read by unauthorized
@@ -42,12 +44,12 @@ D. Ask the client for a larger gift
 6. In most cases, a contract signed by a minor is
 A. void from the start
 B. voidable by the minor
-C. always enforceable
-D. a criminal offence
 1
 Copyright © 2026 Sample Press, Toronto, Ontario
 FINANCE CLUSTER EXAM
 Test 9123
+C. always enforceable
+D. a criminal offence
 
 7. The owner of a sole proprietorship can lose personal assets to pay
 the business’s debts because the owner has
@@ -90,12 +92,12 @@ B. invoice
 C. bill of lading
 D. credit memo
 
-13. A measurable value that shows how effectively a company is achieving
-an important business objective is a
 2
 Copyright © 2026 Sample Press, Toronto, Ontario
 FINANCE CLUSTER EXAM
 Test 9123
+13. A measurable value that shows how effectively a company is achieving
+an important business objective is a
 A. vision statement
 B. key performance indicator
 C. standard operating procedure
@@ -138,12 +140,12 @@ D. gross margin
 goods sold is based on the cost of
 A. the most recent items purchased
 B. the average of all purchases
-C. the oldest items purchased
-D. the current retail price
 3
 Copyright © 2026 Sample Press, Toronto, Ontario
 FINANCE CLUSTER EXAM
 Test 9123
+C. the oldest items purchased
+D. the current retail price
 
 20. Receiving the proceeds of a long-term bank loan is reported in which
 section of the statement of cash flows?
@@ -186,12 +188,12 @@ A. lower risk
 B. higher risk
 C. guaranteed returns
 D. no taxes
-
-26. How much simple interest will be earned on $2,000 invested at 5% per
 4
 Copyright © 2026 Sample Press, Toronto, Ontario
 FINANCE CLUSTER EXAM
 Test 9123
+
+26. How much simple interest will be earned on $2,000 invested at 5% per
 year for three years?
 A. $100
 B. $315.25
@@ -234,12 +236,12 @@ D. inflation
 its products is its
 A. supply chain
 B. board of directors
-C. target market
-D. sales quota
 5
 Copyright © 2026 Sample Press, Toronto, Ontario
 FINANCE CLUSTER EXAM
 Test 9123
+C. target market
+D. sales quota
 
 33. In a SWOT analysis, a new competitor entering the company’s market
 would be classified as a(n)
@@ -282,12 +284,12 @@ A. job rotation
 B. vertical integration
 C. separation of duties
 D. cross-training
-
-39. If inflation is 4% per year and a savings account pays 1.5%
 6
 Copyright © 2026 Sample Press, Toronto, Ontario
 FINANCE CLUSTER EXAM
 Test 9123
+
+39. If inflation is 4% per year and a savings account pays 1.5%
 interest, the saver’s approximate real rate of return is
 A. 5.5%
 B. 2.5%
@@ -330,12 +332,12 @@ B. market risk
 C. pure risk
 D. opportunity risk
 
-45. The main purpose of a résumé is to
-A. list every job you have ever applied for
 7
 Copyright © 2026 Sample Press, Toronto, Ontario
 FINANCE CLUSTER EXAM
 Test 9123
+45. The main purpose of a résumé is to
+A. list every job you have ever applied for
 B. state the salary you expect
 C. replace the job interview
 D. summarize your qualifications so an employer will invite you to an
@@ -378,12 +380,12 @@ D. customer loyalty
 
 51. Spreading money among many different types of investments to reduce
 overall risk is called
-A. speculation
-B. diversification
 8
 Copyright © 2026 Sample Press, Toronto, Ontario
 FINANCE CLUSTER EXAM
 Test 9123
+A. speculation
+B. diversification
 C. leveraging
 D. arbitrage
 
@@ -426,12 +428,12 @@ D. Income statement
 supervisor is to
 A. listen and ask how you can improve
 B. explain why the supervisor is wrong
-C. complain to coworkers
-D. ignore the feedback
 9
 Copyright © 2026 Sample Press, Toronto, Ontario
 FINANCE CLUSTER EXAM
 Test 9123
+C. complain to coworkers
+D. ignore the feedback
 
 58. Which of the following is required for a contract to be legally
 enforceable?
@@ -474,12 +476,12 @@ B. cheaper
 C. tax-free
 D. unavailable
 
-64. The document a buyer sends to a supplier to order goods is a
-A. purchase order
 10
 Copyright © 2026 Sample Press, Toronto, Ontario
 FINANCE CLUSTER EXAM
 Test 9123
+64. The document a buyer sends to a supplier to order goods is a
+A. purchase order
 B. invoice
 C. receipt
 D. packing slip
@@ -522,12 +524,12 @@ D. offer a refund right away
 sure they meet requirements is
 A. market research
 B. cost accounting
-C. product positioning
-D. quality control
 11
 Copyright © 2026 Sample Press, Toronto, Ontario
 FINANCE CLUSTER EXAM
 Test 9123
+C. product positioning
+D. quality control
 
 71. Regularly copying important business files to a separate storage
 location protects a business against
@@ -570,12 +572,12 @@ A. Word processing
 B. Spreadsheet
 C. Presentation
 D. Web browser
-
-77. An email that pretends to be from a bank and asks the recipient to
 12
 Copyright © 2026 Sample Press, Toronto, Ontario
 FINANCE CLUSTER EXAM
 Test 9123
+
+77. An email that pretends to be from a bank and asks the recipient to
 confirm their password is an example of
 A. encryption
 B. a firewall
@@ -618,12 +620,12 @@ C. decreases
 D. doubles
 
 83. An organized collection of related information that can be easily
-searched, sorted, and updated is a
-A. database
 13
 Copyright © 2026 Sample Press, Toronto, Ontario
 FINANCE CLUSTER EXAM
 Test 9123
+searched, sorted, and updated is a
+A. database
 B. spreadsheet chart
 C. word-processing template
 D. slide show
@@ -666,12 +668,12 @@ D. money order
 89. Which of the following is appropriate when writing a professional
 email?
 A. Writing the message entirely in capital letters
-B. Using slang and abbreviations
-C. Leaving the subject line blank
 14
 Copyright © 2026 Sample Press, Toronto, Ontario
 FINANCE CLUSTER EXAM
 Test 9123
+B. Using slang and abbreviations
+C. Leaving the subject line blank
 D. Using a clear and specific subject line
 
 90. A machine costs $12,000, has a salvage value of $2,000, and has a
@@ -714,12 +716,12 @@ score?
 A. Annual income
 B. Payment history
 C. Level of education
-D. Savings account balance
-
 15
 Copyright © 2026 Sample Press, Toronto, Ontario
 FINANCE CLUSTER EXAM
 Test 9123
+D. Savings account balance
+
 96. Which concept explains why $1,000 received today is worth more than
 $1,000 received five years from now?
 A. Time value of money
@@ -796,7 +798,7 @@ SOURCE: Rivera, M., & Chen, L. (2024). Principles of finance (3rd ed.)
 Business ethics. Accepting a gift meant to influence your decisions
 creates a conflict of interest. Most financial institutions have
 policies that require employees to decline such gifts or report them.
-SOURCE: PD:251
+SOURCE: PD:251 Demonstrate ethical work habits
 SOURCE: Lindqvist, A. (2022). Workplace skills: Communication, teamwork,
 and professional growth [pp. 160-162]. Kingston, ON: Harbourline Books.
 
@@ -906,7 +908,7 @@ Test 9123
 and confirm their understanding, for example by paraphrasing or asking
 clarifying questions. Planning a reply or interrupting shows the
 listener isn’t focused on the speaker.
-SOURCE: CO:017
+SOURCE: CO:017 Demonstrate active listening skills
 SOURCE: Lindqvist, A. (2022). Workplace skills: Communication, teamwork,
 and professional growth [pp. 12-14]. Kingston, ON: Harbourline Books.
 
@@ -957,7 +959,7 @@ Test 9123
 Scarcity. Because there are not enough resources to satisfy everyone’s
 wants, individuals, businesses, and governments must make choices about
 how to use them.
-SOURCE: EC:001
+SOURCE: EC:001 Explain the concept of economic resources
 SOURCE: Practice Press. (2025). Economics for business (2nd ed.) [p. 4].
 Hamilton, ON: Practice Press.
 
@@ -982,7 +984,7 @@ SOURCE: Rivera, M., & Chen, L. (2024). Principles of finance (3rd ed.)
 Simple interest. Simple interest is calculated as principal × rate ×
 time: $2,000 × 0.05 × 3 = $300. Compound interest would earn slightly
 more because interest would also be earned on interest.
-SOURCE: FI:062
+SOURCE: FI:062 Explain the time value of money
 SOURCE: Rivera, M., & Chen, L. (2024). Principles of finance (3rd ed.)
 [pp. 58-60]. Toronto, ON: Northlake Press.
 
@@ -1002,7 +1004,8 @@ Test 9123
 Risk transfer. Buying insurance shifts the financial burden of a
 possible loss from the business to the insurance company in exchange for
 a premium.
-SOURCE: RM:043
+SOURCE: RM:043 Explain ways to transfer risk to others (e.g., insurance,
+contracts, warranties, hedging, etc.)
 SOURCE: Rivera, M., & Chen, L. (2024). Principles of finance (3rd ed.)
 [pp. 316-317]. Toronto, ON: Northlake Press.
 
@@ -1010,7 +1013,7 @@ SOURCE: Rivera, M., & Chen, L. (2024). Principles of finance (3rd ed.)
 Depreciation. Depreciation spreads the cost of a long-term tangible
 asset over the years the asset is used to earn revenue. Appreciation is
 an increase in an asset’s value.
-SOURCE: FI:085
+SOURCE: FI:085 Explain the nature of depreciation
 SOURCE: Rivera, M., & Chen, L. (2024). Principles of finance (3rd ed.)
 [pp. 160-161]. Toronto, ON: Northlake Press.
 
@@ -1042,11 +1045,11 @@ SOURCE: Tran, K., & Moreau, J. (2024). Managing business operations [pp.
 SWOT analysis. Strengths and weaknesses are internal to the company,
 while opportunities and threats come from the external environment. A
 new competitor is an external factor that could hurt the business.
-SOURCE: SM:007
 22
 Copyright © 2026 Sample Press, Toronto, Ontario
 FINANCE CLUSTER EXAM—KEY
 Test 9123
+SOURCE: SM:007 Conduct a SWOT analysis for use in the planning process
 SOURCE: Tran, K., & Moreau, J. (2024). Managing business operations [pp.
 12-14]. Waterloo, ON: Northlake Press.
 
@@ -1090,11 +1093,11 @@ SOURCE: FI:357
 SOURCE: Rivera, M., & Chen, L. (2024). Principles of finance (3rd ed.)
 [pp. 300-302]. Toronto, ON: Northlake Press.
 
-39. D
 23
 Copyright © 2026 Sample Press, Toronto, Ontario
 FINANCE CLUSTER EXAM—KEY
 Test 9123
+39. D
 Real rate of return. The real rate of return is approximately the
 nominal interest rate minus the inflation rate: 1.5% - 4% = -2.5%. The
 saver’s money is losing purchasing power.
@@ -1138,11 +1141,11 @@ SOURCE: Rivera, M., & Chen, L. (2024). Principles of finance (3rd ed.)
 44. C
 Pure risk. A pure risk has no chance of gain, only the possibility of
 loss or no loss, which is why it can usually be insured. A speculative
-risk, such as starting a business, can result in a gain or a loss.
 24
 Copyright © 2026 Sample Press, Toronto, Ontario
 FINANCE CLUSTER EXAM—KEY
 Test 9123
+risk, such as starting a business, can result in a gain or a loss.
 SOURCE: RM:040
 SOURCE: Rivera, M., & Chen, L. (2024). Principles of finance (3rd ed.)
 [pp. 314-315]. Toronto, ON: Northlake Press.
@@ -1186,11 +1189,11 @@ long periods, compounding greatly increases the growth of savings and
 investments.
 SOURCE: FI:063
 SOURCE: Rivera, M., & Chen, L. (2024). Principles of finance (3rd ed.)
-[pp. 61-63]. Toronto, ON: Northlake Press.
 25
 Copyright © 2026 Sample Press, Toronto, Ontario
 FINANCE CLUSTER EXAM—KEY
 Test 9123
+[pp. 61-63]. Toronto, ON: Northlake Press.
 
 50. B
 Inventory control. Carrying costs include storage, insurance, spoilage,
@@ -1204,7 +1207,8 @@ SOURCE: Tran, K., & Moreau, J. (2024). Managing business operations [pp.
 Diversification. Diversification reduces risk because poor performance
 by one investment may be offset by better performance from others. It is
 often summarized as not putting all of your eggs in one basket.
-SOURCE: FI:081
+SOURCE: FI:081 Explain types of investments (e.g., stocks, bonds, mutual
+funds, real estate, commodities, etc.)
 SOURCE: Rivera, M., & Chen, L. (2024). Principles of finance (3rd ed.)
 [pp. 262-263]. Toronto, ON: Northlake Press.
 
@@ -1233,12 +1237,12 @@ SOURCE: Lindqvist, A. (2022). Workplace skills: Communication, teamwork,
 and professional growth [pp. 154-155]. Kingston, ON: Harbourline Books.
 
 55. A
-Business letters. Readers are busy, so an effective business letter
-states its purpose at the beginning. The middle paragraphs give details,
 26
 Copyright © 2026 Sample Press, Toronto, Ontario
 FINANCE CLUSTER EXAM—KEY
 Test 9123
+Business letters. Readers are busy, so an effective business letter
+states its purpose at the beginning. The middle paragraphs give details,
 and the closing paragraph states any action needed.
 SOURCE: CO:133
 SOURCE: Lindqvist, A. (2022). Workplace skills: Communication, teamwork,
@@ -1249,7 +1253,8 @@ Income statement. The income statement shows the revenues earned and the
 expenses incurred during a period, and the resulting net income or net
 loss. A balance sheet shows a business’s financial position at one point
 in time.
-SOURCE: FI:094
+SOURCE: FI:094 Explain the purpose and importance of the income
+statement
 SOURCE: Rivera, M., & Chen, L. (2024). Principles of finance (3rd ed.)
 [pp. 188-190]. Toronto, ON: Northlake Press.
 
@@ -1266,7 +1271,7 @@ Contract elements. An enforceable contract requires an offer,
 acceptance, consideration (something of value exchanged), competent
 parties, and a legal purpose. Many contracts are enforceable even if
 they are oral.
-SOURCE: BL:069
+SOURCE: BL:069 Describe legal issues affecting businesses
 SOURCE: Okafor, D. (2023). Business law essentials for Canadian students
 [pp. 88-90]. Ottawa, ON: Maple Leaf Learning.
 
@@ -1280,13 +1285,14 @@ SOURCE: Okafor, D. (2023). Business law essentials for Canadian students
 
 60. A
 Conflict resolution. Most workplace conflicts are best resolved when the
-people involved talk calmly, listen to each other’s views, and look for
-a solution both can accept.
-SOURCE: EI:015
 27
 Copyright © 2026 Sample Press, Toronto, Ontario
 FINANCE CLUSTER EXAM—KEY
 Test 9123
+people involved talk calmly, listen to each other’s views, and look for
+a solution both can accept.
+SOURCE: EI:015 Use conflict-resolution skills (e.g., identify the source
+of the conflict, suggest solutions, reach agreement, etc.)
 SOURCE: Lindqvist, A. (2022). Workplace skills: Communication, teamwork,
 and professional growth [pp. 110-112]. Kingston, ON: Harbourline Books.
 
@@ -1327,14 +1333,14 @@ SOURCE: Tran, K., & Moreau, J. (2024). Managing business operations [pp.
 Accounts receivable. Accounts receivable are amounts customers owe the
 business for goods or services sold on credit. They are current assets
 because the business expects to collect them within a year. Accounts
-payable are amounts the business owes to others.
-SOURCE: FI:073
-SOURCE: Rivera, M., & Chen, L. (2024). Principles of finance (3rd ed.)
-[pp. 141-142]. Toronto, ON: Northlake Press.
 28
 Copyright © 2026 Sample Press, Toronto, Ontario
 FINANCE CLUSTER EXAM—KEY
 Test 9123
+payable are amounts the business owes to others.
+SOURCE: FI:073
+SOURCE: Rivera, M., & Chen, L. (2024). Principles of finance (3rd ed.)
+[pp. 141-142]. Toronto, ON: Northlake Press.
 
 66. D
 Insurance premiums. The premium is the price of insurance coverage,
@@ -1375,14 +1381,14 @@ and services and correcting problems so that they meet the business’s
 standards and customers’ expectations.
 SOURCE: OP:020
 SOURCE: Tran, K., & Moreau, J. (2024). Managing business operations [pp.
-100-102]. Waterloo, ON: Northlake Press.
-
-71. A
-Data backup. Backups make it possible to restore files if the originals
 29
 Copyright © 2026 Sample Press, Toronto, Ontario
 FINANCE CLUSTER EXAM—KEY
 Test 9123
+100-102]. Waterloo, ON: Northlake Press.
+
+71. A
+Data backup. Backups make it possible to restore files if the originals
 are lost because of hardware failure, accidental deletion, fire, or
 malware.
 SOURCE: NF:005
@@ -1423,14 +1429,14 @@ SOURCE: Lindqvist, A. (2022). Workplace skills: Communication, teamwork,
 and professional growth [pp. 36-37]. Kingston, ON: Harbourline Books.
 
 76. B
-Spreadsheets. Spreadsheet software organizes numbers in rows and columns
-and uses formulas to calculate totals automatically, which makes it
-ideal for budgets and financial analysis.
-SOURCE: NF:009
 30
 Copyright © 2026 Sample Press, Toronto, Ontario
 FINANCE CLUSTER EXAM—KEY
 Test 9123
+Spreadsheets. Spreadsheet software organizes numbers in rows and columns
+and uses formulas to calculate totals automatically, which makes it
+ideal for budgets and financial analysis.
+SOURCE: NF:009
 SOURCE: Tran, K., & Moreau, J. (2024). Managing business operations [pp.
 30-31]. Waterloo, ON: Northlake Press.
 
@@ -1438,7 +1444,7 @@ SOURCE: Tran, K., & Moreau, J. (2024). Managing business operations [pp.
 Phishing. Phishing messages impersonate trusted organizations to trick
 people into revealing passwords, account numbers, or other personal
 information. Banks do not ask customers to confirm passwords by email.
-SOURCE: NF:110
+SOURCE: NF:110 Explain the nature of cybersecurity risks to a business
 SOURCE: Tran, K., & Moreau, J. (2024). Managing business operations [pp.
 40-41]. Waterloo, ON: Northlake Press.
 
@@ -1463,7 +1469,7 @@ Statement of cash flows. Investing activities include buying and selling
 long-term assets such as equipment, buildings, and investments.
 Operating activities relate to day-to-day business, and financing
 activities involve borrowing and owners’ investments.
-SOURCE: FI:096
+SOURCE: FI:096 Describe the nature of cash flow statements
 SOURCE: Rivera, M., & Chen, L. (2024). Principles of finance (3rd ed.)
 [pp. 200-203]. Toronto, ON: Northlake Press.
 
@@ -1471,14 +1477,15 @@ SOURCE: Rivera, M., & Chen, L. (2024). Principles of finance (3rd ed.)
 Current ratio. The current ratio measures a business’s ability to pay
 its short-term debts. It is calculated by dividing current assets by
 current liabilities: $150,000 ÷ $60,000 = 2.5.
-SOURCE: FI:093
-SOURCE: Rivera, M., & Chen, L. (2024). Principles of finance (3rd ed.)
-[pp. 212-214]. Toronto, ON: Northlake Press.
-
 31
 Copyright © 2026 Sample Press, Toronto, Ontario
 FINANCE CLUSTER EXAM—KEY
 Test 9123
+SOURCE: FI:093 Calculate financial ratios (e.g., current ratio, quick
+ratio, debt-to-equity ratio, working capital, etc.)
+SOURCE: Rivera, M., & Chen, L. (2024). Principles of finance (3rd ed.)
+[pp. 212-214]. Toronto, ON: Northlake Press.
+
 82. C
 Law of demand. Price and quantity demanded move in opposite directions.
 As prices rise, consumers buy less; as prices fall, they buy more,
@@ -1518,15 +1525,15 @@ revenue did not go as planned.
 SOURCE: FI:106
 SOURCE: Rivera, M., & Chen, L. (2024). Principles of finance (3rd ed.)
 [pp. 290-291]. Toronto, ON: Northlake Press.
+32
+Copyright © 2026 Sample Press, Toronto, Ontario
+FINANCE CLUSTER EXAM—KEY
+Test 9123
 
 87. B
 Liquidity. Liquidity describes how quickly and easily an asset can be
 turned into cash. Cash is the most liquid asset; real estate and
 equipment are much less liquid.
-32
-Copyright © 2026 Sample Press, Toronto, Ontario
-FINANCE CLUSTER EXAM—KEY
-Test 9123
 SOURCE: FI:058
 SOURCE: Rivera, M., & Chen, L. (2024). Principles of finance (3rd ed.)
 [pp. 44-45]. Toronto, ON: Northlake Press.
@@ -1566,15 +1573,15 @@ SOURCE: Rivera, M., & Chen, L. (2024). Principles of finance (3rd ed.)
 92. C
 External audit. In an external audit, independent accountants examine
 the financial statements and records to give an opinion on whether they
+33
+Copyright © 2026 Sample Press, Toronto, Ontario
+FINANCE CLUSTER EXAM—KEY
+Test 9123
 are fairly presented. Investors and lenders rely on audited statements.
 SOURCE: FI:358
 SOURCE: Rivera, M., & Chen, L. (2024). Principles of finance (3rd ed.)
 [pp. 304-305]. Toronto, ON: Northlake Press.
 
-33
-Copyright © 2026 Sample Press, Toronto, Ontario
-FINANCE CLUSTER EXAM—KEY
-Test 9123
 93. C
 Primary data. Primary data are collected firsthand for the current
 purpose. Secondary data were collected earlier by someone else for
@@ -1614,15 +1621,15 @@ and financial information. Sharing a customer’s account details without
 permission breaks the customer’s trust and privacy laws.
 SOURCE: CR:006
 SOURCE: Lindqvist, A. (2022). Workplace skills: Communication, teamwork,
+34
+Copyright © 2026 Sample Press, Toronto, Ontario
+FINANCE CLUSTER EXAM—KEY
+Test 9123
 and professional growth [pp. 66-67]. Kingston, ON: Harbourline Books.
 
 98. A
 Empathy. Empathy means seeing a situation from another person’s point of
 view and understanding how they feel. Empathetic employees build
-34
-Copyright © 2026 Sample Press, Toronto, Ontario
-FINANCE CLUSTER EXAM—KEY
-Test 9123
 stronger working relationships.
 SOURCE: EI:011
 SOURCE: Lindqvist, A. (2022). Workplace skills: Communication, teamwork,

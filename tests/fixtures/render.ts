@@ -80,7 +80,7 @@ export function renderExam(questions: SampleQuestion[], opts: RenderOptions = {}
       kout(`${q.number}. ${q.answer}`);
       kout(q.explanation);
     }
-    const code = `SOURCE: ${q.piCode}`;
+    const code = `SOURCE: ${q.piCode}${q.piTitle ? ` ${q.piTitle}` : ''}`;
     const cite = `SOURCE: ${q.source}`;
     for (const s of citationFirst ? [cite, code] : [code, cite]) kout(s);
     keyBody.push('');
