@@ -49,7 +49,9 @@ saved exams and stats.
 Questions you already have from another exam are linked, not copied, so your
 stats count each question once. If a repeated question's answer differs from
 the stored copy, the review screen tells you and lets you choose which version
-to keep. You can edit any question later from **Library**.
+to keep. You can edit any question later from **Library**, which also shows
+how many times you've completed each exam, your best score and when you last
+took it.
 
 Scanned PDFs (pictures of pages) have no text to read. Paste the text instead.
 

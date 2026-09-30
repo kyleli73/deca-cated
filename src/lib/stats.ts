@@ -35,6 +35,25 @@ export function scorePct(s: Pick<Session, 'correctCount' | 'questionIds'>): numb
   return s.questionIds.length ? ((s.correctCount ?? 0) / s.questionIds.length) * 100 : 0;
 }
 
+export interface ExamRuns {
+  count: number;
+  best: number;
+  lastAt: number;
+}
+
+/** Finished runs of each stored exam (including ones that ran out of time), by exam id. */
+export function examRuns(sessions: Session[]): Map<string, ExamRuns> {
+  const by = new Map<string, ExamRuns>();
+  for (const s of sessions) {
+    if (s.status !== 'finished' || s.mode !== 'exam' || !s.examId) continue;
+    const pct = scorePct(s);
+    const at = s.finishedAt ?? s.updatedAt;
+    const r = by.get(s.examId);
+    by.set(s.examId, r ? { count: r.count + 1, best: Math.max(r.best, pct), lastAt: Math.max(r.lastAt, at) } : { count: 1, best: pct, lastAt: at });
+  }
+  return by;
+}
+
 /** Accuracy per instructional area over answered questions, weakest first. */
 export function areaStats(attempts: Pick<Attempt, 'area' | 'correct' | 'chosen'>[]): AreaStat[] {
   const by = new Map<string, { correct: number; total: number }>();
