@@ -103,9 +103,15 @@ export interface ReviewCard {
 
 export interface Settings {
   id: 'settings';
+  /** Lifetime questions-answered goal on the Stats page. */
   goal: number;
+  /** Time limit for a 100-question exam (Ontario DECA: 70 minutes). */
   examMinutes: number;
+  /** Default pace for drills and mistakes review. */
   secondsPerQuestion: number;
+  /** Countdown shown on the Study page. */
+  eventName: string;
+  eventDate: string;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -113,4 +119,6 @@ export const DEFAULT_SETTINGS: Settings = {
   goal: 100_000,
   examMinutes: 70,
   secondsPerQuestion: 42,
+  eventName: 'Regionals',
+  eventDate: '2026-11-22',
 };
