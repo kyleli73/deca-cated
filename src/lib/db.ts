@@ -13,6 +13,7 @@ export type StudyDB = Dexie & {
 
 export const TABLES = ['exams', 'questions', 'sessions', 'attempts', 'reviews', 'settings'] as const;
 
+// The database keeps its original name: renaming it would start you with empty data.
 export function openDB(name = 'deca-study'): StudyDB {
   const db = new Dexie(name) as StudyDB;
   db.version(1).stores({

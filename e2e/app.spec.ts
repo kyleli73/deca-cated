@@ -248,7 +248,7 @@ test('backup: download, erase, restore', async ({ page }) => {
   await importPdf(page);
   await page.getByRole('link', { name: 'Settings', exact: true }).click();
   const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Download backup (.json)' }).click()]);
-  expect(download.suggestedFilename()).toMatch(/^deca-study-backup-\d{4}-\d{2}-\d{2}\.json$/);
+  expect(download.suggestedFilename()).toMatch(/^deca-cated-backup-\d{4}-\d{2}-\d{2}\.json$/);
   const file = await download.path();
   expect(JSON.parse(readFileSync(file, 'utf8')).questions).toHaveLength(100);
 
@@ -266,5 +266,5 @@ test('backup: download, erase, restore', async ({ page }) => {
   // A file that isn't a backup is rejected without touching the data.
   await page.getByRole('link', { name: 'Settings', exact: true }).click();
   await page.getByTestId('backup-input').setInputFiles({ name: 'x.json', mimeType: 'application/json', buffer: Buffer.from('{"a":1}') });
-  await expect(page.getByText("This file isn't a DECA Study backup.")).toBeVisible();
+  await expect(page.getByText("This file isn't a deca-cated backup.")).toBeVisible();
 });

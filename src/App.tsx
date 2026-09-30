@@ -25,9 +25,9 @@ function Layout() {
     <>
       <header className="topbar">
         <div className="topbar-inner">
-          <NavLink to="/" className="brand" aria-label="DECA Study home">
+          <NavLink to="/" className="brand" aria-label="deca-cated home">
             <img src="/favicon.svg" alt="" />
-            <span>DECA Study</span>
+            <span>deca-cated</span>
           </NavLink>
           <nav className="nav" aria-label="Main">
             {NAV.map((n) => (

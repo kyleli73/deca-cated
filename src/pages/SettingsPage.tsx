@@ -114,7 +114,7 @@ export default function SettingsPage() {
           type="button"
           className="btn danger"
           onClick={() => {
-            if (confirm('Erase all DECA Study data on this device? This cannot be undone.')) {
+            if (confirm('Erase all deca-cated data on this device? This cannot be undone.')) {
               void eraseAll().then(() => setMessage({ kind: 'ok', text: 'All data erased.' }));
             }
           }}

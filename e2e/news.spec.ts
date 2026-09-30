@@ -89,7 +89,7 @@ test('the local feed fetcher only serves the app and only public addresses', asy
   expect((await get('ftp://example.com/feed')).status()).toBe(400);
   const cross = await get('https://example.com/feed', { 'sec-fetch-site': 'cross-site' });
   expect(cross.status()).toBe(403);
-  expect(await cross.text()).toBe('Only DECA Study can use this.');
+  expect(await cross.text()).toBe('Only deca-cated can use this.');
   // A link opened directly (e.g. from an email) can't use it either.
   expect((await get('https://example.com/feed', { 'sec-fetch-site': 'none', 'sec-fetch-dest': 'document' })).status()).toBe(403);
   // IPv4 hidden inside IPv6 is still a local address.

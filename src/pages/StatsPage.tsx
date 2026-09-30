@@ -31,7 +31,7 @@ export default function StatsPage() {
       <div>
         <h1>Stats</h1>
         <p className="lede" style={{ marginBottom: 0 }}>
-          Everything you've done in DECA Study on this device.
+          Everything you've done in deca-cated on this device.
         </p>
       </div>
 

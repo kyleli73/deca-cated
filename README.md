@@ -1,4 +1,4 @@
-# DECA Study
+# deca-cated
 
 A local study app for DECA multiple-choice cluster exams. Import your past
 exams, take them under exam conditions, review every answer with its
@@ -23,7 +23,7 @@ npm run app
 ```
 
 Open <http://localhost:5173> in Chrome or Edge and click the install icon at
-the right of the address bar. After that, DECA Study opens from your dock or
+the right of the address bar. After that, deca-cated opens from your dock or
 Start menu and works without internet, even when `npm run app` isn't running.
 
 `npm run dev` and `npm run app` use the same address, so they share the same
@@ -84,7 +84,7 @@ correct answer and the explanation. From there:
 - **Print or save as PDF**: a clean printable copy.
 - **Download for Blooket (.csv)**: in Blooket, create a set, choose
   **CSV Import**, and upload the file. Blooket takes the questions and
-  answers; the explanations stay in DECA Study.
+  answers; the explanations stay in deca-cated.
 
 ## News
 
@@ -102,7 +102,7 @@ any site's RSS feed.
 
 News sites don't let web pages read their feeds directly, so the app's own
 local server (the one `npm run dev` or `npm run app` starts) fetches them for
-you. It runs only on your computer, only answers DECA Study itself, and only
+you. It runs only on your computer, only answers deca-cated itself, and only
 fetches public addresses. Articles are saved, so if you open the installed app
 without the server running, or you're offline, you still see the last ones
 loaded.

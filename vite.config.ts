@@ -15,8 +15,8 @@ export default defineConfig({
       injectRegister: false,
       includeAssets: ['favicon.svg'],
       manifest: {
-        name: 'DECA Study',
-        short_name: 'DECA Study',
+        name: 'deca-cated',
+        short_name: 'deca-cated',
         description: 'Practise DECA multiple-choice cluster exams offline.',
         start_url: '.',
         scope: '.',

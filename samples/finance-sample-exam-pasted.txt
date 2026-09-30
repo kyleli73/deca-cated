@@ -4,7 +4,7 @@ Written Exam for State/Province Use
 Test Number 9123
 Finance Cluster Exam
 This sample was prepared for the 2025-2026 Competitive Events Program format.
-Written to test the DECA Study importer. This is practice content, not an official DECA or MBA Research exam, and the textbook sources are fictional.
+Written to test the deca-cated importer. This is practice content, not an official DECA or MBA Research exam, and the textbook sources are fictional.
 
 1. Converting data into a code so that it cannot be read by unauthorized
 people is

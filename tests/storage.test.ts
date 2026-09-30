@@ -279,7 +279,7 @@ describe('backup', () => {
   });
 
   it('rejects files that are not backups', () => {
-    expect(() => validateBackup({ hello: 1 })).toThrow("isn't a DECA Study backup");
+    expect(() => validateBackup({ hello: 1 })).toThrow("isn't a deca-cated backup");
     expect(() => validateBackup({ format: 'deca-study-backup', version: 1 })).toThrow(/damaged/);
   });
 });

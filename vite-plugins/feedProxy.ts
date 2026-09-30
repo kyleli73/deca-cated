@@ -24,7 +24,7 @@ const MAX_BYTES = 3 * 1024 * 1024;
 const TIMEOUT_MS = 12_000;
 const CACHE_MS = 10 * 60_000;
 const CACHE_MAX = 60;
-const USER_AGENT = 'Mozilla/5.0 (compatible; DECA-Study/1.0; personal news reader)';
+const USER_AGENT = 'Mozilla/5.0 (compatible; deca-cated/1.0; personal news reader)';
 
 export class HttpError extends Error {
   readonly status: number;
@@ -215,7 +215,7 @@ async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> 
   res.setHeader('content-security-policy', "sandbox; default-src 'none'");
   try {
     if (req.method !== 'GET') throw new HttpError(405, 'Only GET is supported.');
-    if (!isFromApp(req.headers)) throw new HttpError(403, 'Only DECA Study can use this.');
+    if (!isFromApp(req.headers)) throw new HttpError(403, 'Only deca-cated can use this.');
     const url = checkUrl(new URL(req.url ?? '', 'http://local').searchParams.get('url') ?? '');
     const hit = cache.get(url.href);
     const out = hit && Date.now() - hit.at <= CACHE_MS ? hit : remember(url.href, await fetchPublic(url));
@@ -238,7 +238,7 @@ export function feedProxy(): Plugin {
     server.middlewares.use('/api/fetch', (req, res) => void handle(req, res));
   };
   return {
-    name: 'deca-study-feed-proxy',
+    name: 'deca-cated-feed-proxy',
     configureServer: use,
     configurePreviewServer: use,
   };

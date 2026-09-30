@@ -1022,5 +1022,5 @@ export const SAMPLE_PREAMBLE = [
   'Test Number 9123',
   'Finance Cluster Exam',
   'This sample was prepared for the 2025-2026 Competitive Events Program format.',
-  'Written to test the DECA Study importer. This is practice content, not an official DECA or MBA Research exam, and the textbook sources are fictional.',
+  'Written to test the deca-cated importer. This is practice content, not an official DECA or MBA Research exam, and the textbook sources are fictional.',
 ];

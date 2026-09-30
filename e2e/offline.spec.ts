@@ -4,7 +4,7 @@ test('the installed build works offline, including PDF import', async ({ page, c
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Study' })).toBeVisible();
   const manifest = await page.evaluate(async () => (await fetch('/manifest.webmanifest')).json());
-  expect(manifest.name).toBe('DECA Study');
+  expect(manifest.name).toBe('deca-cated');
   expect(manifest.icons.map((i: { sizes: string }) => i.sizes)).toContain('512x512');
 
   // Wait for the service worker to install and take control.

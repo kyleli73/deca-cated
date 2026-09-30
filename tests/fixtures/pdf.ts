@@ -26,7 +26,7 @@ const COVER = [
   'Booklet Number _____',
   'Finance Cluster Exam',
   'INSTRUCTIONS: This is a timed, comprehensive practice exam. Do not open this booklet until instructed to do so.',
-  'This sample was prepared for the 2025-2026 Competitive Events Program format. It was written to test the DECA Study',
+  'This sample was prepared for the 2025-2026 Competitive Events Program format. It was written to test the deca-cated',
   'importer, is not an official DECA or MBA Research exam, and cites fictional textbooks. A descriptive test key has',
   'been provided to the chartered association advisor.',
 ];

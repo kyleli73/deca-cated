@@ -1,6 +1,7 @@
 import { db, TABLES } from './db.ts';
 import type { Attempt, Exam, Question, ReviewCard, Session, Settings } from './types.ts';
 
+/** File format id (kept from the app's first name so older backups still restore). */
 export const BACKUP_FORMAT = 'deca-study-backup';
 
 export interface Backup {
@@ -30,14 +31,14 @@ export async function exportBackup(): Promise<Backup> {
 }
 
 export function backupFileName(date = new Date()): string {
-  return `deca-study-backup-${date.toISOString().slice(0, 10)}.json`;
+  return `deca-cated-backup-${date.toISOString().slice(0, 10)}.json`;
 }
 
 /** Check a parsed JSON file really is one of our backups. Throws a readable error if not. */
 export function validateBackup(data: unknown): Backup {
   const b = data as Partial<Backup> | null;
   if (!b || typeof b !== 'object' || b.format !== BACKUP_FORMAT) {
-    throw new Error("This file isn't a DECA Study backup.");
+    throw new Error("This file isn't a deca-cated backup.");
   }
   if (b.version !== 1) throw new Error(`This backup is from a newer version of the app (version ${String(b.version)}).`);
   for (const t of TABLES) {
