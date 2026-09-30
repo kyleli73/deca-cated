@@ -146,7 +146,7 @@ function getOnce(url: URL): Promise<{ status: number; location?: string; type: s
         res.on('data', (chunk: Buffer) => {
           size += chunk.length;
           if (size > MAX_BYTES) {
-            req.destroy(new HttpError(502, 'The feed is too large.'));
+            req.destroy(new HttpError(502, 'The file is too large (over 3 MB).'));
             return;
           }
           chunks.push(chunk);

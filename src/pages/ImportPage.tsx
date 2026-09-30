@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { QuestionEditor, withFourOptions } from '../components/QuestionEditor.tsx';
 import { Segmented } from '../components/ui.tsx';
 import { fingerprint } from '../lib/fingerprint.ts';
+import { downloadPdf, fileNameFromLink, linksIn } from '../lib/links.ts';
 import { questionIssues, type EditableQuestion, type Issue } from '../lib/parser/issues.ts';
 import { parseExam } from '../lib/parser/parseExam.ts';
 import { findDuplicates, requestPersistentStorage, saveImportedExam, type Duplicate, type ExamMeta } from '../lib/repo.ts';
@@ -12,6 +13,15 @@ import { MetaFields } from './ExamDetailPage.tsx';
 interface Item extends EditableQuestion {
   key: number;
   number: number;
+}
+
+/** Exams being imported from links, one after another. */
+interface LinkQueue {
+  /** Links not saved yet; the first is the one being checked. */
+  links: string[];
+  total: number;
+  saved: string[];
+  linked: number;
 }
 
 /** Guess cluster, year and level from a file name like "2024 Finance District.pdf". */
@@ -59,13 +69,15 @@ export default function ImportPage() {
   const dupeRequest = useRef(0);
   const fpCache = useRef(new WeakMap<Item, string>());
   const [testNumber, setTestNumber] = useState('');
+  const [links, setLinks] = useState('');
+  const [linkError, setLinkError] = useState('');
+  const [queue, setQueue] = useState<LinkQueue | null>(null);
+  const linkCount = linksIn(links).length;
 
-  const load = (input: string | string[][], fileName?: string) => {
+  /** Parse an exam and open the review step. Returns what went wrong, if nothing could be read. */
+  const load = (input: string | string[][], fileName?: string): string | null => {
     const result = parseExam(input);
-    if (!result.questions.length) {
-      setError(result.warnings[0] ?? 'No questions found.');
-      return;
-    }
+    if (!result.questions.length) return result.warnings[0] ?? 'No questions found.';
     setItems(result.questions.map((q, i) => ({ ...withFourOptions(q), key: i, number: q.number })));
     setWarnings(result.warnings);
     setReplace(new Set());
@@ -79,22 +91,53 @@ export default function ImportPage() {
     setError('');
     setStep('review');
     window.scrollTo({ top: 0 });
+    return null;
   };
 
   const readFile = async (file: File) => {
     setError('');
+    setQueue(null);
     try {
       if (/\.pdf$/i.test(file.name) || file.type === 'application/pdf') {
         setBusy(`Reading ${file.name}…`);
         const { pdfToPages } = await import('../lib/parser/pdf.ts');
-        load(await pdfToPages(await file.arrayBuffer()), file.name);
+        setError(load(await pdfToPages(await file.arrayBuffer()), file.name) ?? '');
       } else {
-        load(await file.text(), file.name);
+        setError(load(await file.text(), file.name) ?? '');
       }
     } catch (e) {
       setError(`Couldn't read ${file.name}. ${e instanceof Error ? e.message : ''} If it's a scanned PDF (a picture of text), it has no text to read; paste the text instead.`);
     } finally {
       setBusy('');
+    }
+  };
+
+  /** Download and open the first link in the queue. On failure, go back with the links still to do. */
+  const openLink = async (q: LinkQueue) => {
+    const link = q.links[0];
+    const name = fileNameFromLink(link);
+    const n = q.total - q.links.length + 1;
+    const which = q.total > 1 ? `exam ${n} of ${q.total}` : 'the exam';
+    setQueue(q);
+    setLinks(q.links.join('\n'));
+    setLinkError('');
+    setBusy(`Downloading ${which}…`);
+    let problem: string | null;
+    try {
+      const data = await downloadPdf(link);
+      setBusy(`Reading ${which}…`);
+      const { pdfToPages } = await import('../lib/parser/pdf.ts');
+      problem = load(await pdfToPages(data), name || undefined);
+    } catch (e) {
+      problem = e instanceof Error ? e.message : String(e);
+    } finally {
+      setBusy('');
+    }
+    if (problem) {
+      const before = q.saved.length ? ` The ${q.saved.length} before it ${q.saved.length === 1 ? 'was' : 'were'} saved.` : '';
+      setLinkError(`Couldn't import ${q.total > 1 ? which : 'that link'} (${name || link}): ${problem}${before}`);
+      setQueue(null);
+      setStep('input');
     }
   };
 
@@ -160,7 +203,15 @@ export default function ImportPage() {
         items.map((q) => replace.has(q.key)),
       );
       void requestPersistentStorage();
-      navigate('/library', { state: { saved: exam.title, linked: dupeCount } });
+      const saved = [...(queue?.saved ?? []), exam.title];
+      const linked = (queue?.linked ?? 0) + dupeCount;
+      if (queue && queue.links.length > 1) {
+        await openLink({ ...queue, links: queue.links.slice(1), saved, linked });
+        return;
+      }
+      setQueue(null);
+      setLinks('');
+      navigate('/library', { state: { saved: saved.join('”, “'), linked } });
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
       setBusy('');
@@ -188,7 +239,7 @@ export default function ImportPage() {
           onDragLeave={() => setOver(false)}
           onDrop={onDrop}
         >
-          <strong>{busy || 'Drop a PDF here'}</strong>
+          <strong>{(!queue && busy) || 'Drop a PDF here'}</strong>
           <span className="muted small">or click to choose a file (.pdf or .txt)</span>
           <input
             ref={fileInput}
@@ -202,6 +253,32 @@ export default function ImportPage() {
               e.target.value = '';
             }}
           />
+        </div>
+        <div className="or">or import from links</div>
+        <label className="field">
+          PDF links
+          <textarea
+            value={links}
+            onChange={(e) => setLinks(e.target.value)}
+            placeholder={'https://…/Finance_Cluster_Sample_Exam_2017.pdf\nhttps://…/Finance_Cluster_Sample_Exam_2018.pdf'}
+            style={{ minHeight: 90, fontSize: 14 }}
+          />
+          <span className="field-hint">One or more links to exam PDFs, one per line. The app downloads each one, and you check them one after another.</span>
+        </label>
+        {linkError && (
+          <div className="notice bad" style={{ marginTop: 16 }} role="alert">
+            {linkError}
+          </div>
+        )}
+        <div className="row" style={{ marginTop: 16 }}>
+          <button
+            type="button"
+            className="btn primary big"
+            disabled={!linkCount || !!busy}
+            onClick={() => void openLink({ links: linksIn(links), total: linkCount, saved: [], linked: 0 })}
+          >
+            {(queue && busy) || (linkCount > 1 ? `Import ${linkCount} exams` : 'Import from link')}
+          </button>
         </div>
         <div className="or">or paste the text</div>
         <label className="field">
@@ -219,7 +296,15 @@ export default function ImportPage() {
           </div>
         )}
         <div className="row" style={{ marginTop: 16 }}>
-          <button type="button" className="btn primary big" disabled={!text.trim() || !!busy} onClick={() => load(text)}>
+          <button
+            type="button"
+            className="btn primary big"
+            disabled={!text.trim() || !!busy}
+            onClick={() => {
+              setQueue(null);
+              setError(load(text) ?? '');
+            }}
+          >
             Read exam
           </button>
         </div>
@@ -234,9 +319,19 @@ export default function ImportPage() {
       <div className="page-head">
         <div>
           <h1>Check the questions</h1>
-          <p className="lede">Fix anything flagged, then save. You can also edit questions later from the Library.</p>
+          <p className="lede">
+            {queue && queue.total > 1 && `Exam ${queue.total - queue.links.length + 1} of ${queue.total} from your links. `}
+            Fix anything flagged, then save. You can also edit questions later from the Library.
+          </p>
         </div>
-        <button type="button" className="btn ghost" onClick={() => setStep('input')}>
+        <button
+          type="button"
+          className="btn ghost"
+          onClick={() => {
+            setQueue(null);
+            setStep('input');
+          }}
+        >
           ← Start over
         </button>
       </div>
@@ -317,7 +412,7 @@ export default function ImportPage() {
                 : `${items.length} questions ready.`}
           </span>
           <button type="button" className="btn primary big" disabled={!!busy || errorCount > 0 || !yearOk || !items.length} onClick={() => void save()}>
-            {busy || 'Save exam'}
+            {busy || (queue && queue.links.length > 1 ? 'Save & next' : 'Save exam')}
           </button>
         </div>
       </div>

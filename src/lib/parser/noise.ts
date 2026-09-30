@@ -67,7 +67,8 @@ export function markNoise(lines: Line[], pageCount: number): boolean[] {
 
   const noise = lines.map((l) => {
     const text = l.text;
-    if (isCopyright(text)) return true;
+    // A stray "®" from the copyright footer, even on the one page that has it.
+    if (isCopyright(text) || /^[®™©\s]+$/.test(text)) return true;
     if (STRUCTURAL.test(text) || isPageNumber(text)) return false; // page numbers: second pass
     const sig = signature(text);
     const at = slot(l);
