@@ -120,7 +120,7 @@ test('full exam run-through: import a PDF, take the exam, review, stats and mist
   await expect(page.locator('.hero-sub')).toHaveText('80%');
   await expect(tile(page, 'Answered')).toContainText('95/100');
   await expect(tile(page, 'Average per question')).toContainText('s');
-  await expect(page.getByRole('table', { name: 'Accuracy by instructional area' })).toBeVisible();
+  await expect(page.getByRole('table', { name: 'What you know by instructional area' })).toBeVisible();
   await expect(page.locator('.review-item')).toHaveCount(100);
   await page.getByRole('button', { name: 'Wrong only (20)' }).click();
   await expect(page.locator('.review-item')).toHaveCount(20);

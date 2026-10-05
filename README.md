@@ -76,8 +76,9 @@ are made up.
 
 - **Full exam**: a stored exam or 100 random questions from the clusters you
   pick. Default time is 70 minutes (change it in Settings).
-- **Mistakes review**: questions you got wrong come back until you get them
-  right on 3 different days (after 1 day, then 3 more days).
+- **Mistakes review**: questions you got wrong, or got right by guessing, come
+  back until you get them right without guessing on 3 different days (after
+  1 day, then 3 more days).
 - **Custom drill**: filter by cluster, year, instructional area or questions
   you've never seen.
 
@@ -86,9 +87,34 @@ During an exam, clicking an answer moves to the next question.
 | Key | Does |
 | --- | --- |
 | <kbd>A</kbd>–<kbd>D</kbd> (or <kbd>1</kbd>–<kbd>4</kbd>) | Answer |
+| <kbd>G</kbd> | Mark this question as a guess (press again to unmark) |
+| <kbd>Shift</kbd>+<kbd>A</kbd>–<kbd>D</kbd> | Answer and mark it as a guess |
 | <kbd>←</kbd> <kbd>→</kbd> | Previous or next question |
 
 **Save & exit** keeps your answers and time; resume from the Study page.
+
+### Marking guesses
+
+A score counts lucky guesses as if you knew them. To see what you actually
+know, mark a question as a guess when you aren't sure: press **G** (or click
+**Guessing**) before you answer, or answer with **Shift**+letter. Guessed
+questions get a dashed outline in the question grid. You can change the mark
+later by going back to the question.
+
+Afterwards:
+
+- **Results** show **You knew** (right without guessing) next to your score,
+  and split your answers into *knew it*, *lucky guesses*, *sure but wrong*
+  and *guessed wrong*. *Sure but wrong* are the ones to review first: you
+  thought you knew them.
+- **What you know, by instructional area** ranks areas by what you got right
+  without guessing. The dark part of each bar is what you knew; the light part
+  is what you guessed right.
+- **Guessed** in the review list shows only your guesses, and **Retry missed &
+  guessed** drills both.
+- Lucky guesses go into **Mistakes review** and **Wrong answers** like wrong
+  answers, so you'll see them again until you know them.
+- **Stats** add up all of this across every exam and drill.
 
 ### Calculator
 
@@ -107,8 +133,8 @@ Click the question again to go back to the A–D shortcuts.
 
 ## Wrong answers and Blooket
 
-**Wrong answers** lists every question you've missed, with your answer, the
-correct answer and the explanation. From there:
+**Wrong answers** lists every question you've missed or only got right by
+guessing, with your answer, the correct answer and the explanation. From there:
 
 - **Print or save as PDF**: a clean printable copy.
 - **Download for Blooket (.csv)**: in Blooket, create a set, choose

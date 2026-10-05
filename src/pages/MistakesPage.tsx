@@ -39,7 +39,7 @@ export default function MistakesPage() {
     .filter((x) => !area || x.q.area === area)
     .sort((a, b) =>
       sort === 'most'
-        ? b.card.wrongCount - a.card.wrongCount || b.card.lastWrongAt - a.card.lastWrongAt
+        ? b.card.wrongCount - a.card.wrongCount || (b.card.guessCount ?? 0) - (a.card.guessCount ?? 0) || b.card.lastWrongAt - a.card.lastWrongAt
         : sort === 'area'
           ? areaName(a.q.area).localeCompare(areaName(b.q.area)) || a.q.piCode.localeCompare(b.q.piCode)
           : b.card.lastWrongAt - a.card.lastWrongAt,
@@ -54,7 +54,7 @@ export default function MistakesPage() {
       <div className="page-head">
         <div>
           <h1>Wrong answers</h1>
-          <p className="lede">Every question you've missed, with the right answer and why.</p>
+          <p className="lede">Every question you've missed or only got right by guessing, with the right answer and why.</p>
         </div>
         <div className="row no-print">
           <button type="button" className="btn" onClick={() => window.print()} disabled={!shown.length}>
@@ -69,7 +69,9 @@ export default function MistakesPage() {
       {items.length === 0 ? (
         <div className="empty">
           <h2>No wrong answers yet</h2>
-          <p className="muted">When you miss a question in any exam or drill, it's saved here with its explanation.</p>
+          <p className="muted">
+            When you miss a question in any exam or drill, or get it right but mark it as a guess, it's saved here with its explanation.
+          </p>
           <Link to="/" className="btn primary">
             Start studying
           </Link>
@@ -145,6 +147,7 @@ export default function MistakesPage() {
                 chosen={x.card.lastWrongChoice}
                 chosenLabel="Your last wrong answer"
                 showResult={false}
+                guessed={!x.card.wrongCount}
                 footer={<CardProgress card={x.card} today={today} />}
               />
             ))}
@@ -160,7 +163,8 @@ function CardProgress({ card, today }: { card: ReviewCard; today: string }) {
   return (
     <>
       <span>
-        Missed {card.wrongCount}× · last on {formatDate(card.lastWrongAt)}
+        {[card.wrongCount && `Missed ${card.wrongCount}×`, card.guessCount && `Guessed right ${card.guessCount}×`].filter(Boolean).join(' · ')} · last on{' '}
+        {formatDate(card.lastWrongAt)}
       </span>
       {card.mastered ? (
         <span className="status-pill good">✓ Learned</span>

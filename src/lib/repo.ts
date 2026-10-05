@@ -211,6 +211,7 @@ export async function createSession(input: NewSession): Promise<Session> {
     id: newId(),
     ...input,
     answers: input.questionIds.map(() => null),
+    guesses: input.questionIds.map(() => false),
     currentIndex: 0,
     elapsedSec: 0,
     status: 'active',
@@ -223,7 +224,7 @@ export async function createSession(input: NewSession): Promise<Session> {
   return session;
 }
 
-export async function saveProgress(id: string, patch: Pick<Session, 'answers' | 'currentIndex' | 'elapsedSec'>): Promise<void> {
+export async function saveProgress(id: string, patch: Pick<Session, 'answers' | 'guesses' | 'currentIndex' | 'elapsedSec'>): Promise<void> {
   await db.sessions.where('id').equals(id).and((s) => s.status === 'active').modify({ ...patch, updatedAt: Date.now() });
 }
 
@@ -238,7 +239,7 @@ export async function discardSession(id: string): Promise<void> {
 export async function finishSession(
   id: string,
   endedBy: 'submit' | 'time',
-  final?: Pick<Session, 'answers' | 'elapsedSec'>,
+  final?: Pick<Session, 'answers' | 'elapsedSec'> & Partial<Pick<Session, 'guesses'>>,
 ): Promise<Session | undefined> {
   return db.transaction('rw', [db.sessions, db.questions, db.attempts, db.reviews], async () => {
     const stored = await db.sessions.get(id);
@@ -257,10 +258,11 @@ export async function finishSession(
       if (!q) return; // deleted since the session started
       const chosen = s.answers[i] ?? null;
       const ok = chosen === q.answer;
+      const guessed = !!chosen && !!s.guesses?.[i];
       if (ok) correct++;
-      attempts.push({ sessionId: s.id, questionId: qid, chosen, correct: ok, area: q.area, piCode: q.piCode, mode: s.mode, at: now, day });
+      attempts.push({ sessionId: s.id, questionId: qid, chosen, correct: ok, guessed, area: q.area, piCode: q.piCode, mode: s.mode, at: now, day });
       if (chosen) {
-        const next = applyResult(cards.get(qid), qid, chosen, ok, day, now);
+        const next = applyResult(cards.get(qid), qid, chosen, ok, guessed, day, now);
         if (next) cards.set(qid, next);
       }
     });

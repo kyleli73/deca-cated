@@ -5,9 +5,17 @@ import type { Attempt, Session } from './types.ts';
 export interface AreaStat {
   area: string;
   name: string;
+  /** Right answers, guessed or not. */
   correct: number;
+  /** Right and not marked as a guess: what you actually know. */
+  known: number;
+  /** Right, but marked as a guess. */
+  lucky: number;
   total: number;
+  /** Raw accuracy, the way the exam scores it. */
   pct: number;
+  /** Share answered right without guessing. */
+  knownPct: number;
 }
 
 export interface TrendPoint {
@@ -26,6 +34,12 @@ export interface LifetimeStats {
   bestScore: number | null;
   trend: TrendPoint[];
   areas: AreaStat[];
+  /** Answered right without guessing. */
+  known: number;
+  /** Answered right by guessing. */
+  lucky: number;
+  /** Answered wrong while sure: the misunderstandings worth reviewing first. */
+  sureWrong: number;
   streak: number;
   longestStreak: number;
   studiedToday: boolean;
@@ -54,19 +68,27 @@ export function examRuns(sessions: Session[]): Map<string, ExamRuns> {
   return by;
 }
 
-/** Accuracy per instructional area over answered questions, weakest first. */
-export function areaStats(attempts: Pick<Attempt, 'area' | 'correct' | 'chosen'>[]): AreaStat[] {
-  const by = new Map<string, { correct: number; total: number }>();
+/**
+ * What you know per instructional area over answered questions. Sorted by
+ * the share you got right without guessing, weakest first, so lucky guesses
+ * can't make an area look stronger than it is.
+ */
+export function areaStats(attempts: Pick<Attempt, 'area' | 'correct' | 'chosen' | 'guessed'>[]): AreaStat[] {
+  const by = new Map<string, { correct: number; known: number; lucky: number; total: number }>();
   for (const a of attempts) {
     if (a.chosen === null) continue;
-    const s = by.get(a.area) ?? { correct: 0, total: 0 };
+    const s = by.get(a.area) ?? { correct: 0, known: 0, lucky: 0, total: 0 };
     s.total++;
-    if (a.correct) s.correct++;
+    if (a.correct) {
+      s.correct++;
+      if (a.guessed) s.lucky++;
+      else s.known++;
+    }
     by.set(a.area, s);
   }
   return [...by.entries()]
-    .map(([area, s]) => ({ area, name: areaName(area), ...s, pct: (s.correct / s.total) * 100 }))
-    .sort((a, b) => a.pct - b.pct || b.total - a.total || a.name.localeCompare(b.name));
+    .map(([area, s]) => ({ area, name: areaName(area), ...s, pct: (s.correct / s.total) * 100, knownPct: (s.known / s.total) * 100 }))
+    .sort((a, b) => a.knownPct - b.knownPct || a.pct - b.pct || b.total - a.total || a.name.localeCompare(b.name));
 }
 
 /** Current and longest run of consecutive study days. Today not studied yet doesn't break the streak. */
@@ -109,6 +131,9 @@ export function computeStats(attempts: Attempt[], sessions: Session[], today: st
     bestScore: scores.length ? Math.max(...scores) : null,
     trend: exams.map((s, i) => ({ sessionId: s.id, at: s.finishedAt ?? s.updatedAt, pct: scores[i], title: s.title })),
     areas: areaStats(attempts),
+    known: answered.filter((a) => a.correct && !a.guessed).length,
+    lucky: answered.filter((a) => a.correct && a.guessed).length,
+    sureWrong: answered.filter((a) => !a.correct && !a.guessed).length,
     streak: current,
     longestStreak: longest,
     studiedToday: days.has(today),

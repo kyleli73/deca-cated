@@ -106,9 +106,33 @@ describe('sessions', () => {
     expect(await db.attempts.count()).toBe(100);
     expect(await db.reviews.count()).toBe(20);
 
+    // Nothing was marked as a guess, so no attempt is a guess.
+    expect((await db.attempts.toArray()).every((a) => a.guessed === false)).toBe(true);
+
     // Finishing again does nothing.
     await finishSession(s.id, 'submit');
     expect(await db.attempts.count()).toBe(100);
+  });
+});
+
+describe('guesses', () => {
+  it('records guesses and sends lucky guesses to Mistakes review', async () => {
+    const exam = await saveImportedExam(META, SAMPLE_QUESTIONS.slice(0, 4));
+    const s = await createSession({ mode: 'drill', title: 'x', questionIds: exam.questionIds, timeLimitSec: null });
+    const q = SAMPLE_QUESTIONS;
+    const wrong = (l: Letter): Letter => (l === 'A' ? 'B' : 'A');
+    // right+sure, right+guessed, wrong+guessed, wrong+sure
+    const answers: Letter[] = [q[0].answer, q[1].answer, wrong(q[2].answer), wrong(q[3].answer)];
+    await finishSession(s.id, 'submit', { answers, guesses: [false, true, true, false], elapsedSec: 60 });
+    const attempts = await db.attempts.orderBy('id').toArray();
+    expect(attempts.map((a) => [a.correct, a.guessed])).toEqual([
+      [true, false],
+      [true, true],
+      [false, true],
+      [false, false],
+    ]);
+    const cards = await db.reviews.bulkGet(exam.questionIds);
+    expect(cards.map((c) => (c ? [c.wrongCount, c.guessCount] : null))).toEqual([null, [0, 1], [1, 0], [1, 0]]);
   });
 });
 
@@ -127,25 +151,34 @@ describe('spaced repetition', () => {
   });
 
   it('needs correct answers on different days before a mistake is mastered', () => {
-    let c = applyResult(undefined, 'q', 'A', false, today, 1);
+    let c = applyResult(undefined, 'q', 'A', false, false, today, 1);
     expect(c).toMatchObject({ box: 0, due: today, wrongCount: 1 });
-    c = applyResult(c, 'q', 'B', true, today, 2);
+    c = applyResult(c, 'q', 'B', true, false, today, 2);
     expect(c).toMatchObject({ box: 1, due: addDays(today, 1) });
     // A second correct answer the same day doesn't count.
-    expect(applyResult(c, 'q', 'B', true, today, 3)).toBe(c);
-    c = applyResult(c, 'q', 'B', true, addDays(today, 1), 4);
+    expect(applyResult(c, 'q', 'B', true, false, today, 3)).toBe(c);
+    c = applyResult(c, 'q', 'B', true, false, addDays(today, 1), 4);
     expect(c).toMatchObject({ box: 2, due: addDays(today, 4) });
-    c = applyResult(c, 'q', 'B', true, addDays(today, 4), 5);
+    c = applyResult(c, 'q', 'B', true, false, addDays(today, 4), 5);
     expect(c).toMatchObject({ box: MASTERY_DAYS, mastered: true });
   });
 
   it('a wrong answer resets progress', () => {
-    const c = applyResult(card({ box: 2, lastCorrectDay: today, wrongCount: 2 }), 'q', 'C', false, today, 9);
+    const c = applyResult(card({ box: 2, lastCorrectDay: today, wrongCount: 2 }), 'q', 'C', false, false, today, 9);
     expect(c).toMatchObject({ box: 0, lastCorrectDay: null, wrongCount: 3, lastWrongChoice: 'C', mastered: false });
   });
 
+  it('a lucky guess brings the question back without counting toward learned', () => {
+    const c = applyResult(undefined, 'q', 'B', true, true, today, 5);
+    expect(c).toMatchObject({ box: 0, due: today, wrongCount: 0, guessCount: 1, lastWrongChoice: null, mastered: false });
+    const learning = card({ box: 1, lastCorrectDay: addDays(today, -1) });
+    expect(applyResult(learning, 'q', 'B', true, true, today, 6)).toMatchObject({ box: 1, guessCount: 1 });
+    const mastered = card({ box: MASTERY_DAYS, mastered: true, due: addDays(today, -9) });
+    expect(applyResult(mastered, 'q', 'B', true, true, today, 7)).toMatchObject({ mastered: false, box: MASTERY_DAYS - 1, due: today });
+  });
+
   it('ignores correct answers to questions never missed', () => {
-    expect(applyResult(undefined, 'q', 'A', true, today, 1)).toBeUndefined();
+    expect(applyResult(undefined, 'q', 'A', true, false, today, 1)).toBeUndefined();
   });
 
   it('lists due, unmastered cards', () => {
@@ -233,6 +266,22 @@ describe('stats', () => {
     expect(runs.get('a')).toEqual({ count: 3, best: 85, lastAt: 20 });
     expect(runs.get('b')?.count).toBe(1);
     expect(runs.size).toBe(2);
+  });
+
+  it('separates what you know from lucky guesses, weakest knowledge first', () => {
+    const a = (area: string, correct: boolean, guessed: boolean): Attempt => ({ ...attempt('2026-11-20', correct, area), guessed });
+    const areas = computeStats(
+      [a('FI', true, true), a('FI', true, true), a('FI', true, false), a('FI', false, false), a('BL', true, false), a('BL', false, true)],
+      [],
+      '2026-11-20',
+    ).areas;
+    // FI looks better on raw accuracy (75% vs 50%) but you only knew 25% of it.
+    expect(areas.map((x) => [x.area, x.pct, x.knownPct, x.lucky])).toEqual([
+      ['FI', 75, 25, 2],
+      ['BL', 50, 50, 0],
+    ]);
+    const s = computeStats([a('FI', true, true), a('FI', true, false), a('FI', false, false), a('FI', false, true)], [], '2026-11-20');
+    expect([s.known, s.lucky, s.sureWrong]).toEqual([1, 1, 1]);
   });
 
   it('keeps a streak alive until the end of today', () => {

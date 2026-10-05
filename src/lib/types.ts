@@ -59,6 +59,8 @@ export interface Session {
   examId?: string;
   questionIds: string[];
   answers: (Letter | null)[];
+  /** Answers you marked as guesses (same order as answers). Missing on older sessions = none. */
+  guesses?: boolean[];
   /** Index of the question on screen; questionIds.length means the summary page. */
   currentIndex: number;
   /** null = no time limit (the clock counts up). */
@@ -81,6 +83,8 @@ export interface Attempt {
   questionId: string;
   chosen: Letter | null;
   correct: boolean;
+  /** You marked this answer as a guess. Missing on older attempts = sure. */
+  guessed?: boolean;
   area: string;
   piCode: string;
   mode: SessionMode;
@@ -89,15 +93,18 @@ export interface Attempt {
   day: string;
 }
 
-/** Spaced-repetition state for a question you have answered wrong. */
+/** Spaced-repetition state for a question you answered wrong, or only guessed right. */
 export interface ReviewCard {
   questionId: string;
-  /** Number of different days answered correctly since the last mistake. */
+  /** Number of different days answered correctly (without guessing) since the last mistake. */
   box: number;
   /** Day it is next due in Mistakes review, "YYYY-MM-DD". */
   due: string;
   lastCorrectDay: string | null;
   wrongCount: number;
+  /** Times you got it right by guessing. Missing on older cards = 0. */
+  guessCount?: number;
+  /** Last time you missed it or guessed it. */
   lastWrongAt: number;
   lastWrongChoice: Letter | null;
   mastered: boolean;

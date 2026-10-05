@@ -64,10 +64,13 @@ function ExamRunner({ session, questions }: { session: Session; questions: Quest
   const limit = session.timeLimitSec;
 
   const [answers, setAnswers] = useState<(Letter | null)[]>(session.answers);
+  // Which answers you marked as guesses, so results can tell knowing from lucky.
+  const [guesses, setGuesses] = useState<boolean[]>(session.guesses ?? session.questionIds.map(() => false));
   const [index, setIndex] = useState(Math.min(session.currentIndex, n));
   const [, setTick] = useState(0);
   const [saveError, setSaveError] = useState('');
   const answersRef = useRef(answers);
+  const guessesRef = useRef(guesses);
   const indexRef = useRef(index);
   const lockRef = useRef(false);
   const finishingRef = useRef(false);
@@ -81,6 +84,7 @@ function ExamRunner({ session, questions }: { session: Session; questions: Quest
     if (finishingRef.current) return;
     void saveProgress(session.id, {
       answers: answersRef.current,
+      guesses: guessesRef.current,
       currentIndex: indexRef.current,
       elapsedSec: Math.round(elapsedNow()),
     });
@@ -92,7 +96,7 @@ function ExamRunner({ session, questions }: { session: Session; questions: Quest
       finishingRef.current = true;
       const elapsed = Math.round(limit === null ? elapsedNow() : Math.min(limit, elapsedNow()));
       try {
-        await finishSession(session.id, endedBy, { answers: answersRef.current, elapsedSec: elapsed });
+        await finishSession(session.id, endedBy, { answers: answersRef.current, guesses: guessesRef.current, elapsedSec: elapsed });
         navigate(`/results/${session.id}`, { replace: true });
       } catch (e) {
         // Stay on the exam with autosave back on; Submit retries.
@@ -115,11 +119,28 @@ function ExamRunner({ session, questions }: { session: Session; questions: Quest
     [n],
   );
 
+  const setGuess = useCallback((at: number, value: boolean) => {
+    const next = [...guessesRef.current];
+    next[at] = value;
+    guessesRef.current = next;
+    setGuesses(next);
+  }, []);
+
+  /** Flip "Guessing" for the question on screen (G). */
+  const toggleGuess = useCallback(() => {
+    const at = indexRef.current;
+    if (lockRef.current || at >= n) return;
+    setGuess(at, !guessesRef.current[at]);
+    persist();
+  }, [n, setGuess, persist]);
+
+  /** Answer the question on screen; `asGuess` (Shift + letter) also marks it as a guess. */
   const choose = useCallback(
-    (letter: Letter) => {
+    (letter: Letter, asGuess = false) => {
       const at = indexRef.current;
       if (lockRef.current || at >= n) return;
       if (LETTERS.indexOf(letter) >= questions[at].options.length) return;
+      if (asGuess) setGuess(at, true);
       const next = [...answersRef.current];
       next[at] = letter;
       answersRef.current = next;
@@ -131,7 +152,7 @@ function ExamRunner({ session, questions }: { session: Session; questions: Quest
         go(at + 1);
       }, ADVANCE_MS);
     },
-    [n, questions, persist, go],
+    [n, questions, persist, go, setGuess],
   );
 
   // Clock: re-render 4×/s; auto-submit at zero.
@@ -170,7 +191,10 @@ function ExamRunner({ session, questions }: { session: Session; questions: Quest
       const letter = KEYS[e.key.toLowerCase()];
       if (letter && indexRef.current < n) {
         e.preventDefault();
-        choose(letter);
+        choose(letter, e.shiftKey);
+      } else if (e.key.toLowerCase() === 'g') {
+        e.preventDefault();
+        toggleGuess();
       } else if (e.key === 'ArrowLeft') {
         e.preventDefault();
         go(indexRef.current - 1);
@@ -181,7 +205,7 @@ function ExamRunner({ session, questions }: { session: Session; questions: Quest
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [n, choose, go]);
+  }, [n, choose, go, toggleGuess]);
 
   const elapsed = elapsedNow();
   const remaining = limit === null ? null : Math.max(0, limit - elapsed);
@@ -229,7 +253,7 @@ function ExamRunner({ session, questions }: { session: Session; questions: Quest
           </div>
         )}
         {onSummary ? (
-          <Summary answers={answers} n={n} onGo={go} onSubmit={() => void finish('submit')} index={index} />
+          <Summary answers={answers} guesses={guesses} n={n} onGo={go} onSubmit={() => void finish('submit')} index={index} />
         ) : (
           <>
             <div className="qnum">Question {index + 1}</div>
@@ -257,13 +281,26 @@ function ExamRunner({ session, questions }: { session: Session; questions: Quest
               <button type="button" className="btn" disabled={index === 0} onClick={() => go(index - 1)}>
                 ← Back
               </button>
+              <button
+                type="button"
+                className={`btn guess-toggle${guesses[index] ? ' on' : ''}`}
+                aria-pressed={!!guesses[index]}
+                title="Mark your answer to this question as a guess (G). Results then show what you actually knew."
+                onClick={toggleGuess}
+              >
+                <span className="guess-box" aria-hidden="true">
+                  {guesses[index] ? '✓' : ''}
+                </span>
+                Guessing
+              </button>
               <button type="button" className="btn ghost" onClick={() => go(index + 1)}>
                 {index === n - 1 ? 'Review & submit →' : 'Next →'}
               </button>
             </div>
-            <QuestionGrid answers={answers} n={n} index={index} onGo={go} />
+            <QuestionGrid answers={answers} guesses={guesses} n={n} index={index} onGo={go} />
             <p className="kbd-hint">
-              <kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> <kbd>D</kbd> answer · <kbd>←</kbd> <kbd>→</kbd> move ·{' '}
+              <kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> <kbd>D</kbd> answer · <kbd>G</kbd> guessing · <kbd>Shift</kbd>+<kbd>A</kbd>–<kbd>D</kbd> answer as a
+              guess · <kbd>←</kbd> <kbd>→</kbd> move ·{' '}
               <button type="button" className="link-btn" onClick={() => go(n)}>
                 Review &amp; submit
               </button>
@@ -276,15 +313,27 @@ function ExamRunner({ session, questions }: { session: Session; questions: Quest
   );
 }
 
-function QuestionGrid({ answers, n, index, onGo }: { answers: (Letter | null)[]; n: number; index: number; onGo: (i: number) => void }) {
+function QuestionGrid({
+  answers,
+  guesses,
+  n,
+  index,
+  onGo,
+}: {
+  answers: (Letter | null)[];
+  guesses: boolean[];
+  n: number;
+  index: number;
+  onGo: (i: number) => void;
+}) {
   return (
     <nav className="qgrid" aria-label="Jump to question">
       {Array.from({ length: n }, (_, i) => (
         <button
           key={i}
           type="button"
-          className={`${answers[i] ? 'answered' : ''}${i === index ? ' current' : ''}`}
-          aria-label={`Question ${i + 1}${answers[i] ? ', answered' : ''}`}
+          className={`${answers[i] ? 'answered' : ''}${answers[i] && guesses[i] ? ' guessed' : ''}${i === index ? ' current' : ''}`}
+          aria-label={`Question ${i + 1}${answers[i] ? ', answered' : ''}${answers[i] && guesses[i] ? ', marked as a guess' : ''}`}
           aria-current={i === index ? 'step' : undefined}
           onClick={() => onGo(i)}
         >
@@ -297,18 +346,21 @@ function QuestionGrid({ answers, n, index, onGo }: { answers: (Letter | null)[];
 
 function Summary({
   answers,
+  guesses,
   n,
   index,
   onGo,
   onSubmit,
 }: {
   answers: (Letter | null)[];
+  guesses: boolean[];
   n: number;
   index: number;
   onGo: (i: number) => void;
   onSubmit: () => void;
 }) {
   const unanswered = answers.map((a, i) => (a ? null : i)).filter((i): i is number => i !== null);
+  const guessed = answers.filter((a, i) => a && guesses[i]).length;
   return (
     <>
       <h1 className="stem" style={{ marginBottom: 8 }}>
@@ -317,6 +369,7 @@ function Summary({
       <p className="muted">
         You've answered {n - unanswered.length} of {n} questions.
         {unanswered.length > 0 && ' Unanswered questions are marked wrong.'}
+        {guessed > 0 && ` You marked ${guessed} as ${guessed === 1 ? 'a guess' : 'guesses'}.`}
       </p>
       {unanswered.length > 0 && (
         <p>
@@ -331,7 +384,7 @@ function Summary({
           ))}
         </p>
       )}
-      <QuestionGrid answers={answers} n={n} index={index} onGo={onGo} />
+      <QuestionGrid answers={answers} guesses={guesses} n={n} index={index} onGo={onGo} />
       <div className="exam-nav">
         <button type="button" className="btn" onClick={() => onGo(n - 1)}>
           ← Back to questions

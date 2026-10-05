@@ -3,6 +3,8 @@
   --accent-hover: #1d4ed8;
   --accent-weak: #eff4ff;
   --accent-track: #dbe6fd;
+  /* Lighter step of the accent: right answers you guessed. */
+  --accent-light: #8fb0f5;
   --ink: #111827;
   --ink-2: #374151;
   --muted: #6b7280;
@@ -435,6 +437,11 @@ textarea:focus {
   color: var(--good);
   font-weight: 500;
 }
+.tag.guess-tag {
+  background: var(--warn-weak);
+  border-color: var(--warn-line);
+  color: var(--warn);
+}
 
 /* --------------------------------------------------------------- study page */
 
@@ -666,6 +673,35 @@ textarea:focus {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
 }
+/* Answered, but marked as a guess. */
+.qgrid button.answered.guessed {
+  background: var(--surface);
+  border: 1.5px dashed var(--accent);
+}
+
+.guess-toggle {
+  gap: 8px;
+}
+.guess-box {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 1;
+  color: #fff;
+}
+.guess-toggle.on {
+  border-color: var(--accent);
+  background: var(--accent-weak);
+  color: var(--accent);
+}
+.guess-toggle.on .guess-box {
+  background: var(--accent);
+  border-color: var(--accent);
+}
 .kbd-hint {
   margin-top: 24px;
   font-size: 13px;
@@ -820,7 +856,7 @@ kbd {
 }
 .bar-row {
   display: grid;
-  grid-template-columns: minmax(120px, 220px) 1fr 88px;
+  grid-template-columns: minmax(120px, 220px) 1fr 124px;
   align-items: center;
   gap: 12px;
   font-size: 14px;
@@ -836,19 +872,57 @@ kbd {
   font-size: 12px;
 }
 .bar-track {
+  display: flex;
   height: 12px;
   background: var(--soft);
   border-radius: 0 4px 4px 0;
   position: relative;
 }
 .bar-fill {
+  flex: none;
   height: 100%;
   background: var(--accent);
   border-radius: 0 4px 4px 0;
   min-width: 2px;
 }
+.bar-fill:not(:last-child) {
+  border-radius: 0;
+}
+.bar-fill.lucky {
+  background: var(--accent-light);
+}
+/* A thin gap between "knew it" and "guessed right". */
+.bar-fill + .bar-fill {
+  border-left: 2px solid var(--surface);
+}
+.bar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.bar-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+.swatch.known {
+  background: var(--accent);
+}
+.swatch.lucky {
+  background: var(--accent-light);
+}
 .bar-row .val {
   text-align: right;
+  white-space: nowrap;
   font-variant-numeric: tabular-nums;
   color: var(--ink-2);
 }
@@ -1425,7 +1499,7 @@ table.data td.n {
     padding: 14px 16px;
   }
   .bar-row {
-    grid-template-columns: 1fr 72px;
+    grid-template-columns: 1fr auto;
   }
   .bar-row .bar-track {
     grid-column: 1 / -1;

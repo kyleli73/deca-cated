@@ -9,6 +9,7 @@ export function QuestionReview({
   chosen,
   chosenLabel = 'Your answer',
   showResult = true,
+  guessed = false,
   footer,
 }: {
   number: number;
@@ -16,6 +17,8 @@ export function QuestionReview({
   chosen: Letter | null;
   chosenLabel?: string;
   showResult?: boolean;
+  /** You marked your answer as a guess. */
+  guessed?: boolean;
   footer?: ReactNode;
 }) {
   const right = chosen === question.answer;
@@ -24,6 +27,7 @@ export function QuestionReview({
       <div className="row" style={{ marginBottom: 8 }}>
         <span className="muted small num">Question {number}</span>
         <span className="spacer" />
+        {guessed && <span className="tag guess-tag">Guessed</span>}
         {!showResult ? null : chosen === null ? (
           <span className="status-pill muted">Not answered</span>
         ) : right ? (

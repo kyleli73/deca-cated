@@ -93,6 +93,12 @@ export default function StatsPage() {
           value={`${s.streak} day${s.streak === 1 ? '' : 's'}`}
           sub={s.streak > 0 && !s.studiedToday ? 'Study today to keep it' : `Longest: ${s.longestStreak}`}
         />
+        <Tile
+          label="You knew"
+          value={s.answered ? pct((s.known / s.answered) * 100) : '–'}
+          sub={`${s.known.toLocaleString()} of ${s.answered.toLocaleString()} answers right without guessing · ${s.lucky.toLocaleString()} lucky guess${s.lucky === 1 ? '' : 'es'}`}
+        />
+        <Tile label="Sure but wrong" value={s.sureWrong.toLocaleString()} sub="wrong answers you didn't mark as guesses" />
       </div>
 
       <section className="card">
@@ -105,8 +111,8 @@ export default function StatsPage() {
 
       <section className="card">
         <div className="card-head">
-          <h2>Accuracy by instructional area</h2>
-          <span className="muted small">All modes · weakest first</span>
+          <h2>What you know, by instructional area</h2>
+          <span className="muted small">Right without guessing · all modes · weakest first</span>
         </div>
         <AreaBars areas={s.areas} />
       </section>

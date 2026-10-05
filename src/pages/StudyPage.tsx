@@ -201,7 +201,7 @@ function MistakesCard({ reviews, settings }: { reviews: ReviewCard[]; settings: 
         <div>
           <h2 id="mistakes">Mistakes review</h2>
           <p className="muted small" style={{ margin: 0 }}>
-            Questions you got wrong come back until you get them right on 3 different days.
+            Questions you got wrong or guessed come back until you get them right, without guessing, on 3 different days.
           </p>
         </div>
         <Link to="/mistakes" className="small">
