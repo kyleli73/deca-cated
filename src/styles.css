@@ -451,9 +451,10 @@ textarea:focus {
 /* --------------------------------------------------------------- study page */
 
 .countdown {
-  display: inline-flex;
+  display: flex;
   gap: 6px;
   align-items: baseline;
+  margin: 0 0 4px;
   color: var(--muted);
 }
 .countdown strong {

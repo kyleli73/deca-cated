@@ -55,13 +55,24 @@ export default function SettingsPage() {
         </div>
         <div className="fields" style={{ marginTop: 16 }}>
           <label className="field">
-            Countdown to
+            Exam countdown
+            <input type="text" value={settings.examName} onChange={(e) => set({ examName: e.target.value })} />
+          </label>
+          <label className="field">
+            Exam date
+            <input type="date" value={settings.examDate} onChange={(e) => set({ examDate: e.target.value })} />
+            <span className="field-hint">Ontario DECA 2026 online exams: Nov 3 for Marketing, Nov 5 for every other cluster</span>
+          </label>
+        </div>
+        <div className="fields" style={{ marginTop: 16 }}>
+          <label className="field">
+            Roleplay countdown
             <input type="text" value={settings.eventName} onChange={(e) => set({ eventName: e.target.value })} />
           </label>
           <label className="field">
-            Date
+            Roleplay date
             <input type="date" value={settings.eventDate} onChange={(e) => set({ eventDate: e.target.value })} />
-            <span className="field-hint">Clear it to hide the countdown</span>
+            <span className="field-hint">Clear a date to hide its countdown</span>
           </label>
         </div>
       </section>
