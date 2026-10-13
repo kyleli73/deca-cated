@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { QuestionEditor, withFourOptions } from '../components/QuestionEditor.tsx';
 import { Segmented } from '../components/ui.tsx';
 import { fingerprint } from '../lib/fingerprint.ts';
+import { isTouch } from '../lib/hosted.ts';
 import { downloadPdf, fileNameFromLink, linksIn } from '../lib/links.ts';
 import { questionIssues, type EditableQuestion, type Issue } from '../lib/parser/issues.ts';
 import { parseExam } from '../lib/parser/parseExam.ts';
@@ -73,6 +74,7 @@ export default function ImportPage() {
   const [linkError, setLinkError] = useState('');
   const [queue, setQueue] = useState<LinkQueue | null>(null);
   const linkCount = linksIn(links).length;
+  const touch = isTouch();
 
   /** Parse an exam and open the review step. Returns what went wrong, if nothing could be read. */
   const load = (input: string | string[][], fileName?: string): string | null => {
@@ -239,8 +241,8 @@ export default function ImportPage() {
           onDragLeave={() => setOver(false)}
           onDrop={onDrop}
         >
-          <strong>{(!queue && busy) || 'Drop a PDF here'}</strong>
-          <span className="muted small">or click to choose a file (.pdf or .txt)</span>
+          <strong>{(!queue && busy) || (touch ? 'Choose a PDF' : 'Drop a PDF here')}</strong>
+          <span className="muted small">{touch ? 'Tap to pick an exam from Files or Downloads' : 'or click to choose a file (.pdf or .txt)'}</span>
           <input
             ref={fileInput}
             type="file"
@@ -261,7 +263,8 @@ export default function ImportPage() {
             value={links}
             onChange={(e) => setLinks(e.target.value)}
             placeholder={'https://…/Finance_Cluster_Sample_Exam_2017.pdf\nhttps://…/Finance_Cluster_Sample_Exam_2018.pdf'}
-            style={{ minHeight: 90, fontSize: 14 }}
+            className="compact"
+            style={{ minHeight: 90 }}
           />
           <span className="field-hint">One or more links to exam PDFs, one per line. The app downloads each one, and you check them one after another.</span>
         </label>
@@ -287,7 +290,8 @@ export default function ImportPage() {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder={'1. Which of the following…\nA. …\nB. …\nC. …\nD. …\n\nANSWER KEY\n1. B\nExplanation…\nSOURCE: FI:093\nSOURCE: …'}
-            style={{ minHeight: 220, fontSize: 14 }}
+            className="compact"
+            style={{ minHeight: 220 }}
           />
         </label>
         {error && (

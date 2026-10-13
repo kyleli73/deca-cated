@@ -299,8 +299,11 @@ function ExamRunner({ session, questions }: { session: Session; questions: Quest
             </div>
             <QuestionGrid answers={answers} guesses={guesses} n={n} index={index} onGo={go} />
             <p className="kbd-hint">
-              <kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> <kbd>D</kbd> answer · <kbd>G</kbd> guessing · <kbd>Shift</kbd>+<kbd>A</kbd>–<kbd>D</kbd> answer as a
-              guess · <kbd>←</kbd> <kbd>→</kbd> move ·{' '}
+              {/* Keyboard tips are hidden on touch screens; the link stays. */}
+              <span className="kbd-keys">
+                <kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> <kbd>D</kbd> answer · <kbd>G</kbd> guessing · <kbd>Shift</kbd>+<kbd>A</kbd>–<kbd>D</kbd> answer as
+                a guess · <kbd>←</kbd> <kbd>→</kbd> move ·{' '}
+              </span>
               <button type="button" className="link-btn" onClick={() => go(n)}>
                 Review &amp; submit
               </button>

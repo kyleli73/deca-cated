@@ -99,6 +99,8 @@ p {
   background: rgba(255, 255, 255, 0.94);
   backdrop-filter: saturate(1.4) blur(8px);
   border-bottom: 1px solid var(--line);
+  /* Installed on a phone, the app runs under the status bar and around the notch. */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
 }
 .topbar-inner {
   max-width: 920px;
@@ -151,7 +153,7 @@ p {
 .page {
   max-width: 920px;
   margin: 0 auto;
-  padding: 40px 16px 96px;
+  padding: 40px max(16px, env(safe-area-inset-right)) calc(96px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
 }
 
 .page-head {
@@ -331,6 +333,9 @@ textarea {
   min-height: 40px;
   width: 100%;
 }
+textarea.compact {
+  font-size: 14px;
+}
 textarea {
   resize: vertical;
   line-height: 1.45;
@@ -503,6 +508,7 @@ textarea:focus {
   z-index: 20;
   background: var(--surface);
   border-bottom: 1px solid var(--line);
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
 }
 .exam-bar-inner {
   max-width: 920px;
@@ -563,7 +569,7 @@ textarea:focus {
   width: 100%;
   max-width: 760px;
   margin: 0 auto;
-  padding: 48px 16px 64px;
+  padding: 48px max(16px, env(safe-area-inset-right)) calc(64px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
 }
 .qnum {
   font-size: 14px;
@@ -1513,6 +1519,23 @@ table.data td.n {
   }
 }
 
+/* Phones and tablets. */
+@media (hover: none) and (pointer: coarse) {
+  /* iPhones zoom in on a field whose text is under 16px when it's tapped. */
+  input[type='text'],
+  input[type='number'],
+  input[type='date'],
+  input:not([type]),
+  select,
+  textarea,
+  textarea.compact {
+    font-size: 16px;
+  }
+  .kbd-keys {
+    display: none;
+  }
+}
+
 /* ------------------------------------------------------------------- print */
 
 @media print {
@@ -1533,4 +1556,16 @@ table.data td.n {
 }
 .print-only {
   display: none;
+}
+
+/* ----------------------------------------------------------------- blooket */
+
+.blooket-sets {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.blooket-sets > li {
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
 }

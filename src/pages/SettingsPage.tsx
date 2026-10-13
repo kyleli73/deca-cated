@@ -19,7 +19,7 @@ export default function SettingsPage() {
 
   const doExport = async () => {
     const backup = await exportBackup();
-    download(backupFileName(), JSON.stringify(backup), 'application/json');
+    if (!(await download(backupFileName(), JSON.stringify(backup), 'application/json'))) return;
     setMessage({ kind: 'ok', text: `Downloaded a backup of ${backup.exams.length} exams, ${backup.questions.length} questions and ${backup.sessions.length} sessions.` });
   };
 

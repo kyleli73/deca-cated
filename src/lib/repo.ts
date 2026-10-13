@@ -8,6 +8,7 @@ import {
   DEFAULT_SETTINGS,
   LETTERS,
   type Attempt,
+  type BlooketSet,
   type Cluster,
   type Exam,
   type Letter,
@@ -193,6 +194,23 @@ export async function updateQuestion(id: string, q: EditableQuestion): Promise<v
     if (clash && clash.id !== id) throw new Error('Another question in your library already has exactly this text and these options.');
     await db.questions.update(id, fields);
   });
+}
+
+// ------------------------------------------------------------ blooket sets
+
+/** Remember a set just downloaded for Blooket, so its link can be added once it's on Blooket. */
+export async function saveBlooketSet(name: string, questionIds: string[]): Promise<BlooketSet> {
+  const set: BlooketSet = { id: newId(), name: name.trim() || 'Wrong answers', questionIds, createdAt: Date.now(), url: null };
+  await db.blooketSets.add(set);
+  return set;
+}
+
+export async function setBlooketLink(id: string, url: string | null): Promise<void> {
+  await db.blooketSets.update(id, { url });
+}
+
+export async function deleteBlooketSet(id: string): Promise<void> {
+  await db.blooketSets.delete(id);
 }
 
 // ----------------------------------------------------------------- sessions

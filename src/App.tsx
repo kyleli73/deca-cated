@@ -1,5 +1,6 @@
 import { HashRouter, Navigate, NavLink, Outlet, Route, Routes } from 'react-router-dom';
 import { CalculatorPanel, CalculatorToggle } from './components/Calculator.tsx';
+import { asset, HOSTED } from './lib/hosted.ts';
 import ExamDetailPage from './pages/ExamDetailPage.tsx';
 import ExamPage from './pages/ExamPage.tsx';
 import ImportPage from './pages/ImportPage.tsx';
@@ -15,7 +16,8 @@ const NAV = [
   { to: '/', label: 'Study', end: true },
   { to: '/mistakes', label: 'Wrong answers' },
   { to: '/stats', label: 'Stats' },
-  { to: '/news', label: 'News' },
+  // News needs the local server, which the phone version doesn't have.
+  ...(HOSTED ? [] : [{ to: '/news', label: 'News' }]),
   { to: '/library', label: 'Library' },
   { to: '/import', label: 'Import' },
   { to: '/settings', label: 'Settings' },
@@ -27,7 +29,7 @@ function Layout() {
       <header className="topbar">
         <div className="topbar-inner">
           <NavLink to="/" className="brand" aria-label="deca-cated home">
-            <img src="/favicon.svg" alt="" />
+            <img src={asset('favicon.svg')} alt="" />
             <span>deca-cated</span>
           </NavLink>
           <nav className="nav" aria-label="Main">
