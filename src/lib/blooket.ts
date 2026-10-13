@@ -1,4 +1,36 @@
-import { LETTERS, type Question } from './types.ts';
+import { LETTERS, type BlooketSet, type Question } from './types.ts';
+
+/** Where sets are created. Blooket has no way for another app to create a set or open one question, so the link goes to the home page. */
+export const BLOOKET_HOME = 'https://www.blooket.com/';
+
+/**
+ * A pasted Blooket set link, tidied up, or null unless it's an https page on
+ * blooket.com (so a lookalike such as blooket.com.example.net is refused).
+ * The "https://" may be left off.
+ */
+export function blooketLink(pasted: string): string | null {
+  const text = pasted.trim();
+  if (!text) return null;
+  let url: URL;
+  try {
+    url = new URL(/^[a-z][a-z\d+.-]*:/i.test(text) ? text : `https://${text}`);
+  } catch {
+    return null;
+  }
+  const host = url.hostname.toLowerCase();
+  if (url.protocol !== 'https:' || url.username || url.password) return null;
+  return host === 'blooket.com' || host.endsWith('.blooket.com') ? url.href : null;
+}
+
+/** For each question, the newest set it's in that has a Blooket link. */
+export function linkedSets(sets: BlooketSet[]): Map<string, BlooketSet> {
+  const out = new Map<string, BlooketSet>();
+  for (const set of [...sets].sort((a, b) => b.createdAt - a.createdAt)) {
+    if (!set.url) continue;
+    for (const id of set.questionIds) if (!out.has(id)) out.set(id, set);
+  }
+  return out;
+}
 
 /** Header rows of Blooket's "Spreadsheet Import Template" (CSV Import on the set creator page). */
 const TITLE_ROW = ['Blooket\nImport Template', '', '', '', '', '', '', ''];

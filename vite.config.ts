@@ -6,7 +6,11 @@ import { feedProxy } from './vite-plugins/feedProxy.ts';
 // Dev (`npm run dev`) and the installable build (`npm run app`) both use port
 // 5173. Browser storage is per address, so using one port means both see the
 // same saved exams and stats.
+//
+// The phone version is the same app on GitHub Pages, under /deca-cated/
+// (BASE_PATH) and built with VITE_HOSTED=1: see .github/workflows/pages.yml.
 export default defineConfig({
+  base: process.env.BASE_PATH || '/',
   plugins: [
     react(),
     feedProxy(),

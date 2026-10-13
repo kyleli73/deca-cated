@@ -29,6 +29,29 @@ Start menu and works without internet, even when `npm run app` isn't running.
 `npm run dev` and `npm run app` use the same address, so they share the same
 saved exams and stats.
 
+### On your phone
+
+The phone version is the same app, published at
+<https://kyleli73.github.io/deca-cated/>. Add it to your home screen and it
+opens full screen like an app and works offline:
+
+- **iPhone:** open the address in Safari, tap **Share**, then
+  **Add to Home Screen**.
+- **Android:** open it in Chrome, tap the **⋮** menu, then **Install app**.
+
+Its exams and stats are stored on the phone, separate from your computer. To
+copy everything across, use **Settings → Download backup** on one device (on a
+phone this opens the share sheet, so you can save it to Files or Google Drive)
+and **Restore from backup…** on the other. Restoring replaces what's there.
+
+On the phone there's no **News** (it needs the local server on your computer).
+Import from links works for DECA's sample exams; for sites that block other
+apps, open the link, save the PDF, and choose it as a file.
+
+Every push to `main` rebuilds the phone version
+(`.github/workflows/pages.yml`). The first time, turn it on in the repository
+on GitHub: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+
 ## Import an exam
 
 1. Go to **Import**.
@@ -137,9 +160,15 @@ Click the question again to go back to the A–D shortcuts.
 guessing, with your answer, the correct answer and the explanation. From there:
 
 - **Print or save as PDF**: a clean printable copy.
-- **Download for Blooket (.csv)**: in Blooket, create a set, choose
-  **CSV Import**, and upload the file. Blooket takes the questions and
-  answers; the explanations stay in deca-cated.
+- **Download for Blooket (.csv)**: name the set, then in Blooket create a
+  set with that name, choose **CSV Import**, and upload the file. Blooket
+  takes the questions and answers; the explanations stay in deca-cated.
+
+Each download is listed under **Your Blooket sets**. Once the set is made on
+Blooket, open it, copy its link from the address bar and paste it there. Every
+question in that set then gets an **Open in Blooket ↗** link. Blooket doesn't
+let other apps create sets or open a single question, so the link opens the
+whole set. Only blooket.com links are accepted.
 
 ## News
 
@@ -176,7 +205,7 @@ data, or switching browsers or computers, starts you fresh. To back up:
 
 ```sh
 npm test            # unit tests: parser, storage, stats, spaced repetition, backup, Blooket CSV
-npm run test:e2e    # browser tests: full exam run-through, import review, timer, backup, offline
+npm run test:e2e    # browser tests: full exam run-through, import review, timer, backup, offline, Blooket sets, phone version
 npm run typecheck
 npm run samples     # regenerate samples/ from tests/fixtures/sampleExam.ts
 npm run check-pdf -- path/to/exam.pdf   # how the importer reads a PDF, without the app

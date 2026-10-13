@@ -1,3 +1,5 @@
+import { HOSTED } from './hosted.ts';
+
 /** Web addresses in pasted text (one per line, or separated by spaces), duplicates dropped. */
 export function linksIn(text: string): string[] {
   return [...new Set(text.match(/https?:\/\/[^\s<>"']+/gi) ?? [])];
@@ -46,6 +48,14 @@ export async function downloadPdf(link: string): Promise<ArrayBuffer> {
     // Blocked by the site (CORS) or offline: the local server tries next.
   }
   if (res && !res.ok) throw new Error(`${new URL(link).hostname} answered ${res.status}. Check the link.`);
+  // The phone version has no local server to fall back on.
+  if (!res && HOSTED) {
+    throw new Error(
+      navigator.onLine === false
+        ? "You're offline. Connect to the internet and try again."
+        : "This site doesn't let other apps download its files. Open the link, save the PDF, then choose it as a file above.",
+    );
+  }
   const data = res ? await res.arrayBuffer() : await viaLocalServer(link);
   if (!isPdf(data)) throw new Error("That link isn't a PDF. Use the link that opens the exam PDF itself.");
   return data;

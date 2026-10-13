@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { isTouch } from '../lib/hosted.ts';
 
 export function Chips<T extends string | number>({
   options,
@@ -84,8 +85,23 @@ export function Tile({ label, value, sub }: { label: string; value: ReactNode; s
   );
 }
 
-export function download(fileName: string, content: string, type: string) {
-  const url = URL.createObjectURL(new Blob([content], { type }));
+/**
+ * Save a file. On a phone this opens the share sheet (Save to Files, Google
+ * Drive, AirDrop…), since a plain download is hard to find there. Resolves
+ * false if the share sheet was closed without saving.
+ */
+export async function download(fileName: string, content: string, type: string): Promise<boolean> {
+  const file = new File([content], fileName, { type });
+  if (isTouch() && navigator.canShare?.({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file] });
+      return true;
+    } catch (e) {
+      if (e instanceof DOMException && e.name === 'AbortError') return false;
+      // Not allowed (e.g. the tap was too long ago): download it instead.
+    }
+  }
+  const url = URL.createObjectURL(file);
   const a = document.createElement('a');
   a.href = url;
   a.download = fileName;
@@ -93,6 +109,7 @@ export function download(fileName: string, content: string, type: string) {
   a.click();
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+  return true;
 }
 
 export function pct(n: number | null | undefined): string {

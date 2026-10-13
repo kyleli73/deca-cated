@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { Segmented } from '../components/ui.tsx';
 import { useSettings } from '../hooks.ts';
 import { db } from '../lib/db.ts';
+import { HOSTED } from '../lib/hosted.ts';
 import { allSources, forgetSource, markRead, refreshNews, sortTime, studyLinks, TOPICS, type NewsSource, type SourceStatus, type Topic } from '../lib/news.ts';
 import { getSettings, modifySettings } from '../lib/repo.ts';
 import { dayKey, formatDate } from '../lib/time.ts';
@@ -30,6 +31,26 @@ function groupLabel(t: number): string {
 }
 
 export default function NewsPage() {
+  return HOSTED ? <NoNewsHere /> : <News />;
+}
+
+/** The phone version has no local server to fetch feeds through. */
+function NoNewsHere() {
+  return (
+    <div>
+      <h1>News</h1>
+      <div className="empty">
+        <h2>News is only in deca-cated on your computer</h2>
+        <p className="muted">
+          News sites don't let web pages read their feeds, so the computer version fetches them through its own local server. The phone version
+          doesn't have one.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function News() {
   const settings = useSettings();
   const items = useLiveQuery(() => db.news.toArray());
   const [topic, setTopic] = useState<Topic | 'all'>('all');

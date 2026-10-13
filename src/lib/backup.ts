@@ -1,5 +1,5 @@
 import { db, TABLES } from './db.ts';
-import type { Attempt, Exam, Question, ReviewCard, Session, Settings } from './types.ts';
+import type { Attempt, BlooketSet, Exam, Question, ReviewCard, Session, Settings } from './types.ts';
 
 /** File format id (kept from the app's first name so older backups still restore). */
 export const BACKUP_FORMAT = 'deca-study-backup';
@@ -14,6 +14,8 @@ export interface Backup {
   attempts: Attempt[];
   reviews: ReviewCard[];
   settings: Settings[];
+  /** Not in backups made before Blooket sets existed. */
+  blooketSets: BlooketSet[];
 }
 
 export async function exportBackup(): Promise<Backup> {
@@ -27,6 +29,7 @@ export async function exportBackup(): Promise<Backup> {
     attempts: await db.attempts.toArray(),
     reviews: await db.reviews.toArray(),
     settings: await db.settings.toArray(),
+    blooketSets: await db.blooketSets.toArray(),
   }));
 }
 
@@ -41,6 +44,7 @@ export function validateBackup(data: unknown): Backup {
     throw new Error("This file isn't a deca-cated backup.");
   }
   if (b.version !== 1) throw new Error(`This backup is from a newer version of the app (version ${String(b.version)}).`);
+  b.blooketSets ??= [];
   for (const t of TABLES) {
     if (!Array.isArray(b[t])) throw new Error(`The backup is damaged: "${t}" is missing.`);
   }
@@ -57,6 +61,7 @@ export async function restoreBackup(b: Backup): Promise<void> {
     await db.attempts.bulkAdd(b.attempts);
     await db.reviews.bulkAdd(b.reviews);
     await db.settings.bulkAdd(b.settings);
+    await db.blooketSets.bulkAdd(b.blooketSets);
   });
 }
 

@@ -1,19 +1,22 @@
 import 'fake-indexeddb/auto';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { db } from '../src/lib/db.ts';
+import Dexie from 'dexie';
+import { db, openDB } from '../src/lib/db.ts';
 import { eraseAll, exportBackup, restoreBackup, validateBackup } from '../src/lib/backup.ts';
 import {
   createSession,
   deleteExam,
   findDuplicates,
   finishSession,
+  saveBlooketSet,
   saveImportedExam,
+  setBlooketLink,
   updateQuestion,
   type ExamMeta,
 } from '../src/lib/repo.ts';
 import { applyResult, MASTERY_DAYS } from '../src/lib/srs.ts';
 import { computeStats, examRuns, streaks } from '../src/lib/stats.ts';
-import { toBlooketCsv } from '../src/lib/blooket.ts';
+import { blooketLink, linkedSets, toBlooketCsv } from '../src/lib/blooket.ts';
 import { dueQuestionIds, filterQuestions } from '../src/lib/select.ts';
 import { addDays, dayKey } from '../src/lib/time.ts';
 import type { Attempt, Letter, Question, ReviewCard, Session } from '../src/lib/types.ts';
@@ -341,6 +344,44 @@ describe('backup', () => {
     expect(await db.sessions.count()).toBe(1);
   });
 
+  it('upgrades a database from before Blooket sets without losing anything', async () => {
+    // The schema as it was (versions 1 and 2), with an exam in it.
+    const old = new Dexie('upgrade-test');
+    old.version(1).stores({
+      exams: 'id, cluster, year, level, importedAt',
+      questions: 'id, &fingerprint, area, *examIds, *clusters, *years',
+      sessions: 'id, status, mode, finishedAt',
+      attempts: '++id, sessionId, questionId, day, area',
+      reviews: 'questionId, due',
+      settings: 'id',
+    });
+    old.version(2).stores({ news: 'id, *sourceIds, firstSeenAt' });
+    await old.table('exams').add({ id: 'e1', title: 'Finance 2024', cluster: 'Finance', year: 2024, level: 'District', questionIds: [], importedAt: 1 });
+    old.close();
+
+    const upgraded = openDB('upgrade-test');
+    expect((await upgraded.exams.toArray()).map((e) => e.title)).toEqual(['Finance 2024']);
+    expect(await upgraded.blooketSets.count()).toBe(0);
+    upgraded.close();
+    await Dexie.delete('upgrade-test');
+  });
+
+  it('keeps Blooket sets, and still restores a backup made before they existed', async () => {
+    const exam = await saveImportedExam(META, SAMPLE_QUESTIONS.slice(0, 3));
+    const set = await saveBlooketSet('Week 1', exam.questionIds);
+    await setBlooketLink(set.id, 'https://dashboard.blooket.com/set/abc123');
+    const backup = JSON.parse(JSON.stringify(await exportBackup()));
+
+    await eraseAll();
+    await restoreBackup(validateBackup(backup));
+    expect(await db.blooketSets.toArray()).toEqual([{ ...set, url: 'https://dashboard.blooket.com/set/abc123' }]);
+
+    delete backup.blooketSets; // as in a backup from an older version
+    await restoreBackup(validateBackup(backup));
+    expect(await db.blooketSets.count()).toBe(0);
+    expect(await db.questions.count()).toBe(3);
+  });
+
   it('rejects files that are not backups', () => {
     expect(() => validateBackup({ hello: 1 })).toThrow("isn't a deca-cated backup");
     expect(() => validateBackup({ format: 'deca-study-backup', version: 1 })).toThrow(/damaged/);
@@ -352,5 +393,31 @@ describe('Blooket export', () => {
     const csv = toBlooketCsv([{ stem: 'What is "net income", really?', options: ['a', 'b\nc', 'd', 'e'], answer: 'C' }], 45);
     expect(csv.startsWith('"Blooket\nImport Template",,,,,,,\r\nQuestion #,Question Text,Answer 1,Answer 2,"Answer 3\n(Optional)"')).toBe(true);
     expect(csv).toContain('1,"What is ""net income"", really?",a,"b\nc",d,e,45,3\r\n');
+  });
+
+  it('accepts only links to blooket.com, over https', () => {
+    expect(blooketLink(' https://dashboard.blooket.com/set/abc123 ')).toBe('https://dashboard.blooket.com/set/abc123');
+    expect(blooketLink('www.blooket.com/set/abc123')).toBe('https://www.blooket.com/set/abc123');
+    expect(blooketLink('https://blooket.com/set/x')).toBe('https://blooket.com/set/x');
+    for (const bad of [
+      'http://www.blooket.com/set/x',
+      'https://blooket.com.evil.com/set/x',
+      'https://evilblooket.com/set/x',
+      'https://user:pw@www.blooket.com/set/x',
+      'javascript:alert(1)',
+      'not a link',
+      '',
+    ]) {
+      expect(blooketLink(bad), bad).toBeNull();
+    }
+  });
+
+  it('links each question to the newest set it is in that has a Blooket link', () => {
+    const set = (id: string, createdAt: number, questionIds: string[], url: string | null) => ({ id, name: id, createdAt, questionIds, url });
+    const older = set('older', 1, ['q1', 'q2'], 'https://www.blooket.com/set/older');
+    const newer = set('newer', 2, ['q2', 'q3'], 'https://www.blooket.com/set/newer');
+    const unlinked = set('unlinked', 3, ['q1', 'q4'], null);
+    const map = linkedSets([older, unlinked, newer]);
+    expect(Object.fromEntries([...map].map(([q, s]) => [q, s.id]))).toEqual({ q1: 'older', q2: 'newer', q3: 'newer' });
   });
 });

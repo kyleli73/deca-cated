@@ -1,5 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie';
-import type { Attempt, Exam, NewsItem, Question, ReviewCard, Session, Settings } from './types.ts';
+import type { Attempt, BlooketSet, Exam, NewsItem, Question, ReviewCard, Session, Settings } from './types.ts';
 
 export type StudyDB = Dexie & {
   exams: EntityTable<Exam, 'id'>;
@@ -9,9 +9,10 @@ export type StudyDB = Dexie & {
   reviews: EntityTable<ReviewCard, 'questionId'>;
   settings: EntityTable<Settings, 'id'>;
   news: EntityTable<NewsItem, 'id'>;
+  blooketSets: EntityTable<BlooketSet, 'id'>;
 };
 
-export const TABLES = ['exams', 'questions', 'sessions', 'attempts', 'reviews', 'settings'] as const;
+export const TABLES = ['exams', 'questions', 'sessions', 'attempts', 'reviews', 'settings', 'blooketSets'] as const;
 
 // The database keeps its original name: renaming it would start you with empty data.
 export function openDB(name = 'deca-study'): StudyDB {
@@ -26,6 +27,8 @@ export function openDB(name = 'deca-study'): StudyDB {
   });
   // v2: saved news articles (a cache, so it isn't part of backups).
   db.version(2).stores({ news: 'id, *sourceIds, firstSeenAt' });
+  // v3: sets downloaded for Blooket, and their links there.
+  db.version(3).stores({ blooketSets: 'id, createdAt, *questionIds' });
   return db;
 }
 

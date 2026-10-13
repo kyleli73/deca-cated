@@ -129,6 +129,19 @@ export interface Settings {
   newsFetchedAt: number;
 }
 
+/**
+ * Questions downloaded together for Blooket's CSV Import. Blooket can't be
+ * told about the set, so its link is pasted back in once the set exists there.
+ */
+export interface BlooketSet {
+  id: string;
+  name: string;
+  questionIds: string[];
+  createdAt: number;
+  /** The set on blooket.com; null until it's pasted in. */
+  url: string | null;
+}
+
 /** A saved news article (cached so the News page works offline). */
 export interface NewsItem {
   /** The article's link. */

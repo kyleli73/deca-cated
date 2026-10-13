@@ -1,14 +1,15 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { BlooketPanel } from '../components/BlooketPanel.tsx';
 import { QuestionReview } from '../components/QuestionReview.tsx';
-import { download, Segmented } from '../components/ui.tsx';
+import { Segmented } from '../components/ui.tsx';
 import { areaName } from '../lib/areas.ts';
-import { toBlooketCsv } from '../lib/blooket.ts';
+import { linkedSets } from '../lib/blooket.ts';
 import { db } from '../lib/db.ts';
 import { MASTERY_DAYS } from '../lib/srs.ts';
 import { dayKey, formatDate, formatDay } from '../lib/time.ts';
-import type { Question, ReviewCard } from '../lib/types.ts';
+import type { BlooketSet, Question, ReviewCard } from '../lib/types.ts';
 
 type Status = 'learning' | 'learned' | 'all';
 type Sort = 'recent' | 'most' | 'area';
@@ -23,9 +24,9 @@ export default function MistakesPage() {
   const [status, setStatus] = useState<Status>('learning');
   const [area, setArea] = useState('');
   const [sort, setSort] = useState<Sort>('recent');
-  const [blooketTime, setBlooketTime] = useState(60);
+  const sets = useLiveQuery(() => db.blooketSets.toArray());
 
-  if (!cards || !questions) return null;
+  if (!cards || !questions || !sets) return null;
 
   const items = cards.map((c) => ({ card: c, q: questions.get(c.questionId) })).filter((x): x is { card: ReviewCard; q: Question } => !!x.q);
   const counts = {
@@ -46,8 +47,7 @@ export default function MistakesPage() {
     );
 
   const today = dayKey();
-  const exportBlooket = () =>
-    download(`deca-wrong-answers-blooket-${today}.csv`, toBlooketCsv(shown.map((x) => x.q), blooketTime), 'text/csv;charset=utf-8');
+  const inBlooket = linkedSets(sets);
 
   return (
     <div>
@@ -114,28 +114,7 @@ export default function MistakesPage() {
               </label>
             </div>
             <hr style={{ border: 0, borderTop: '1px solid var(--line)', margin: '20px 0' }} />
-            <div className="row" style={{ alignItems: 'flex-end', gap: 16 }}>
-              <div style={{ flex: 1, minWidth: 240 }}>
-                <h3 style={{ marginBottom: 2 }}>Blooket</h3>
-                <p className="muted small" style={{ margin: 0 }}>
-                  Downloads the {shown.length} questions shown as a CSV for Blooket's “CSV Import” when you create a set. Blooket imports the questions and
-                  answers; explanations stay here.
-                </p>
-              </div>
-              <label className="field" style={{ width: 150 }}>
-                Seconds per question
-                <select value={blooketTime} onChange={(e) => setBlooketTime(Number(e.target.value))}>
-                  {[20, 30, 45, 60, 90, 120].map((t) => (
-                    <option key={t} value={t}>
-                      {t}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <button type="button" className="btn primary" onClick={exportBlooket} disabled={!shown.length}>
-                Download for Blooket (.csv)
-              </button>
-            </div>
+            <BlooketPanel questions={shown.map((x) => x.q)} />
           </div>
 
           <div className="review-list">
@@ -148,7 +127,7 @@ export default function MistakesPage() {
                 chosenLabel="Your last wrong answer"
                 showResult={false}
                 guessed={!x.card.wrongCount}
-                footer={<CardProgress card={x.card} today={today} />}
+                footer={<CardProgress card={x.card} today={today} blooket={inBlooket.get(x.q.id)} />}
               />
             ))}
             {shown.length === 0 && <p className="muted">Nothing here with these filters.</p>}
@@ -159,7 +138,7 @@ export default function MistakesPage() {
   );
 }
 
-function CardProgress({ card, today }: { card: ReviewCard; today: string }) {
+function CardProgress({ card, today, blooket }: { card: ReviewCard; today: string; blooket?: BlooketSet }) {
   return (
     <>
       <span>
@@ -172,6 +151,12 @@ function CardProgress({ card, today }: { card: ReviewCard; today: string }) {
         <span>
           Right on {card.box} of {MASTERY_DAYS} days · {card.due <= today ? 'due now' : `next review ${formatDay(card.due)}`}
         </span>
+      )}
+      {/* Blooket can't open one question, so this opens the set it's in. */}
+      {blooket?.url && (
+        <a className="no-print" href={blooket.url} target="_blank" rel="noreferrer" title={`Opens the set “${blooket.name}” on Blooket`}>
+          Open in Blooket ↗
+        </a>
       )}
     </>
   );
