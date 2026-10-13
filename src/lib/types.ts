@@ -118,7 +118,9 @@ export interface Settings {
   examMinutes: number;
   /** Default pace for drills and mistakes review. */
   secondsPerQuestion: number;
-  /** Countdown shown on the Study page. */
+  /** Countdowns on the Study page: the online cluster exam, and the event with the roleplays. */
+  examName: string;
+  examDate: string;
   eventName: string;
   eventDate: string;
   /** News sources you switched off (ids). */
@@ -150,6 +152,9 @@ export const DEFAULT_SETTINGS: Settings = {
   goal: 100_000,
   examMinutes: 70,
   secondsPerQuestion: 42,
+  // Ontario DECA 2026 online cluster exams: Marketing Nov 3, every other cluster Nov 5.
+  examName: 'Cluster exam',
+  examDate: '2026-11-05',
   eventName: 'Regionals',
   eventDate: '2026-11-22',
   newsDisabled: [],

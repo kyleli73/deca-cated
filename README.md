@@ -74,6 +74,10 @@ are made up.
 
 ## Study
 
+The Study page counts down to your online cluster exam (Ontario DECA 2026:
+November 3 for Marketing, November 5 for every other cluster) and to the event
+with your roleplays. Change either one, or clear its date, in **Settings**.
+
 - **Full exam**: a stored exam or 100 random questions from the clusters you
   pick. Default time is 70 minutes (change it in Settings).
 - **Mistakes review**: questions you got wrong, or got right by guessing, come

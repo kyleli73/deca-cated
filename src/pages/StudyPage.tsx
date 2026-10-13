@@ -27,19 +27,27 @@ export default function StudyPage() {
 
   if (!exams || !questions || !active || !reviews || !seen) return null;
 
-  const days = settings.eventDate ? daysUntil(settings.eventDate) : null;
+  // Soonest first; a countdown with no date, or whose day has passed, is hidden.
+  const countdowns = [
+    { name: settings.examName, date: settings.examDate },
+    { name: settings.eventName, date: settings.eventDate },
+  ]
+    .filter((c) => c.date)
+    .map((c) => ({ ...c, days: daysUntil(c.date) }))
+    .filter((c) => c.days >= 0)
+    .sort((a, b) => a.days - b.days);
 
   return (
     <>
       <div className="page-head">
         <div>
           <h1>Study</h1>
-          {days !== null && days >= 0 && (
-            <p className="countdown">
-              <strong>{days === 0 ? 'Today' : `${days} day${days === 1 ? '' : 's'}`}</strong>
-              {days === 0 ? `is ${settings.eventName}. Good luck!` : `until ${settings.eventName} · ${formatDay(settings.eventDate)}`}
+          {countdowns.map((c) => (
+            <p className="countdown" key={`${c.name}|${c.date}`}>
+              <strong>{c.days === 0 ? 'Today' : `${c.days} day${c.days === 1 ? '' : 's'}`}</strong>
+              {c.days === 0 ? `is ${c.name}. Good luck!` : `until ${c.name} · ${formatDay(c.date)}`}
             </p>
-          )}
+          ))}
         </div>
       </div>
 
